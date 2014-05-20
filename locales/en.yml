@@ -1,0 +1,10 @@
+en:
+  vagrant_xenserver:
+    config:
+      host_required: |-
+        A XenServer host must be defined via "xs_host"
+      username_required: |-
+        The XenServer username must be defined via "xs_username"
+      password_required: |-
+        The password for the XenServer username must be defined via "xs_password"
+
