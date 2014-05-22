@@ -8,6 +8,8 @@ module VagrantPlugins
       end
 
       def action(name)
+        action_method = "action_#{name}"
+        return Action.send(action_method) if Action.respond_to?(action_method)
         nil
       end
 

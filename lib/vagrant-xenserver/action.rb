@@ -9,11 +9,14 @@ module VagrantPlugins
 
       def self.action_up
 	Vagrant::Action::Builder.new.tap do |b|
+          b.use HandleBoxUrl
+          b.use ConfigValidate
           b.use DummyMessage
         end
       end
 
       action_root = Pathname.new(File.expand_path('../action', __FILE__))
+      autoload :ConnectXS, action_root.join("connect_xs")
       autoload :DummyMessage, action_root.join('dummy')
     end
   end

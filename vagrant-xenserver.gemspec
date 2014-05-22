@@ -15,10 +15,8 @@ Gem::Specification.new do |s|
   s.add_development_dependency "rake"
 
   s.files         = `git ls-files`.split($\)
-  s.executables   = gem.files.grep(%r{^bin/}).map{ |f| File.basename(f) }
-  s.test_files    = gem.files.grep(%r{^(test|spec|features)/})
-  s.name          = 'vagrant-libvirt'
+  s.executables   = [] # gem.files.grep(%r{^bin/}).map{ |f| File.basename(f) }
+  s.test_files    = [] #gem.files.grep(%r{^(test|spec|features)/})
   s.require_paths = ['lib']
-  s.version       = VagrantPlugins::ProviderLibvirt::VERSION
 
 end
