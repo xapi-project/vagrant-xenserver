@@ -18,11 +18,16 @@ module VagrantPlugins
       end
 
       def state
-        return nil
+        env = @machine.action("read_state")
+
+        state_id = env[:machine_state_id]
+        
+        Vagrant::MachineState.new(state_id, state_id, state_id)
       end
 
       def to_s
-        return nil
+        id = @machine.id.nil? ? "new" : @machine.id
+        "XenServer (#{id})"
       end
     end
   end

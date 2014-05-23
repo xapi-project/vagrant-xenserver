@@ -7,7 +7,7 @@ module VagrantPlugins
 	end
 
 	def call(env)
-	  env[:ui].info("dummy")
+	  env[:ui].info(env[:session])
 	end
       end
     end
