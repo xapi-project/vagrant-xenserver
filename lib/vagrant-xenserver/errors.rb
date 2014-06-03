@@ -11,6 +11,14 @@ module VagrantPlugins
         error_key(:login_error)
       end
 
+      class UploaderInterrupted < VagrantXenServerError
+        error_key(:uploader_interrupted)
+      end
+
+      class UploaderError < VagrantXenServerError
+        error_key(:uploader_error)
+      end
+
     end
   end
 end

@@ -8,7 +8,7 @@ require "vagrant/util/subprocess"
 
 module VagrantPlugins
   module XenServer
-    module Util
+    module MyUtil
       # This class uploads files using various protocols by subprocessing
       # to cURL. cURL is a much more capable and complete upload tool than
       # a hand-rolled Ruby library, so we defer to its expertise.
@@ -153,8 +153,8 @@ module VagrantPlugins
           end
 
           # Execute!
-          result = Busy.busy(int_callback) do
-            Subprocess.execute("curl", *options, &data_proc)
+          result = Vagrant::Util::Busy.busy(int_callback) do
+            Vagrant::Util::Subprocess.execute("curl", *options, &data_proc)
           end
 
           # If the upload was interrupted, then raise a specific error
