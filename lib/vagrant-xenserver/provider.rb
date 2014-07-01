@@ -14,7 +14,8 @@ module VagrantPlugins
       end
 
       def ssh_info
-        return nil
+        env = @machine.action('read_ssh_info')
+        env[:machine_ssh_info]
       end
 
       def state
