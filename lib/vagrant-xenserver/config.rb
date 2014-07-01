@@ -17,17 +17,24 @@ module VagrantPlugins
       #
       # @return [String]
       attr_accessor :xs_password
-      
+
+      # True if the VM should be PV
+      #
+      # @return [Bool]
+      attr_accessor :pv
+
       def initialize
         @xs_host = UNSET_VALUE
         @xs_username = UNSET_VALUE
         @xs_password = UNSET_VALUE
+        @pv = UNSET_VALUE
       end
 
       def finalize!
         @xs_host = nil if @xs_host == UNSET_VALUE
         @xs_username = nil if @xs_username == UNSET_VALUE
         @xs_password = nil if @xs_password == UNSET_VALUE
+        @pv = nil if @pv == UNSET_VALUE
       end
 
       def validate(machine)

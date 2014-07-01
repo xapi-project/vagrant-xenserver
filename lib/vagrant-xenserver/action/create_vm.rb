@@ -63,6 +63,11 @@ module VagrantPlugins
           
           @logger.info("vif_res=" + vif_res.to_s)
 
+          if env[:machine].provider_config.pv
+            env[:xc].call("VM.set_HVM_boot_policy",env[:session],vm_ref,"")
+            env[:xc].call("VM.set_PV_bootloader",env[:session],vm_ref,"pygrub")
+          end
+
           env[:xc].call("VM.provision",env[:session],vm_ref)
 
           env[:machine].id = vm_ref

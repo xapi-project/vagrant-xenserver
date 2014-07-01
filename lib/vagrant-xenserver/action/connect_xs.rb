@@ -11,18 +11,20 @@ module VagrantPlugins
         end
 
         def call(env)
-          env[:xc] = XMLRPC::Client.new(env[:machine].provider_config.xs_host, "/", "80")
-          
-          @logger.info("Connecting to XenServer")
-          
-          sess_result = env[:xc].call("session.login_with_password", env[:machine].provider_config.xs_username, env[:machine].provider_config.xs_password,"1.0")
-          
-          if sess_result["Status"] != "Success"
-            raise Errors::LoginError
+          if not env[:session]
+            env[:xc] = XMLRPC::Client.new(env[:machine].provider_config.xs_host, "/", "80")
+            
+            @logger.info("Connecting to XenServer")
+            
+            sess_result = env[:xc].call("session.login_with_password", env[:machine].provider_config.xs_username, env[:machine].provider_config.xs_password,"1.0")
+            
+            if sess_result["Status"] != "Success"
+              raise Errors::LoginError
+            end
+            
+            env[:session] = sess_result["Value"]
           end
 
-          env[:session] = sess_result["Value"]
-          
           @app.call(env)
         end
       end
