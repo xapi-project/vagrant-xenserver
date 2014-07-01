@@ -29,7 +29,7 @@ module VagrantPlugins
 
           vbd_record = {
             'VM' => vm_ref,
-            'VDI' => env[:box_vdi],
+            'VDI' => env[:my_vdi],
             'userdevice' => '0',
             'bootable' => true,
             'mode' => 'RW',

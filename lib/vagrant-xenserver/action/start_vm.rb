@@ -17,7 +17,7 @@ module VagrantPlugins
           myvm = env[:machine].id
           
           env[:xc].call("VM.start",env[:session],myvm,false,false)
-          
+
           @app.call env
         end
       end
