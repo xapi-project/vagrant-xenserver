@@ -14,8 +14,8 @@ module VagrantPlugins
         end
         
         def call(env)
-          #box_image_file = env[:machine].box.directory.join('export.xva').to_s
-          box_vhd_file = "/home/jludlam/devel/vagrant-xenserver/centos-6.5.vhd"
+          box_vhd_file = env[:machine].box.directory.join('box.vhd').to_s
+
           hostname = env[:machine].provider_config.xs_host
           session = env[:session]
 
