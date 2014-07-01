@@ -68,6 +68,9 @@ module VagrantPlugins
             env[:xc].call("VM.set_PV_bootloader",env[:session],vm_ref,"pygrub")
           end
 
+          mem = ((env[:machine].provider_config.memory) * (1024*1024)).to_s
+
+          env[:xc].call("VM.set_memory_limits",env[:session],vm_ref,mem,mem,mem,mem)
           env[:xc].call("VM.provision",env[:session],vm_ref)
 
           env[:machine].id = vm_ref
