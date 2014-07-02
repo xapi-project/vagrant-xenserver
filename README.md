@@ -4,7 +4,7 @@ This is a Vagrant plugin that adds a XenServer provider, allowing Vagrant to
 control and provision machines on a XenServer host.
 
 ## Dependencies
-* Vagrant >= 1.6(?) (http://www.vagrantup.com/downloads.html)
+* Vagrant >= 1.5(?) (http://www.vagrantup.com/downloads.html)
 
 ## Installation
 ```shell
