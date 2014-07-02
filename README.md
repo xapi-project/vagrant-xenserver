@@ -30,9 +30,9 @@ RELATED,ESTABLISHED -j ACCEPT
 /sbin/iptables -A FORWARD -i xenapi -o xenbr0 -j ACCEPT
 ```
 
-## Usage
+# Usage
 
-# Converting a VirtualBox box file
+## Converting a VirtualBox box file
 
 * Download the box file (e.g. https://vagrantcloud.com/ubuntu/trusty64/version/1/provider/virtualbox.box)
 * Unpack it:
@@ -62,7 +62,7 @@ tar cf ../xenserver.box .
 vagrant box add ubuntu xenserver.box
 ```
 
-# Create a Vagrantfile
+## Create a Vagrantfile
 
 ```ruby
 # -*- mode: ruby -*-
