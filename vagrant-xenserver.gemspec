@@ -8,7 +8,7 @@ Gem::Specification.new do |s|
   s.license       = "MIT"
   s.authors       = "Jon Ludlam"
   s.email         = "jonathan.ludlam@citrix.com"
-  s.homepage      = "http://www.xenserver.org"
+  s.homepage      = "http://github.com/jonludlam/vagrant-xenserver"
   s.summary       = "Enables Vagrant to manage XenServers."
   s.description   = "Enables Vagrant to manage XenServers."
 
