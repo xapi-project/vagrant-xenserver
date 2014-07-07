@@ -24,8 +24,11 @@ module VagrantPlugins
 
           # Find out if it has already been uploaded
           vdis = env[:xc].call("VDI.get_all_records", env[:session])['Value']
-          
-          vdi_tag = "vagrant:" + env[:machine].box.name.to_s + "/" + env[:machine].box.version.to_s
+          md5=`dd if=#{box_vhd_file} bs=1M count=1 | md5sum | cut '-d ' -f1`.strip
+
+          @logger.info("md5=#{md5}")
+
+          vdi_tag = "vagrant:" + env[:machine].box.name.to_s + "/" + md5
 
           vdi_ref_rec = vdis.find { |reference,record|
                 @logger.info(record['tags'].to_s)
