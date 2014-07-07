@@ -1,3 +1,8 @@
+# 0.0.2 (7 July 2014)
+
+* Support older versions of qemu-img that don't output
+  json
+
 # 0.0.1 (7 July 2014)
 
 * Use the md5 of the first meg of VHD to tag the base VDI
