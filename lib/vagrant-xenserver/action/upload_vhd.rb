@@ -38,9 +38,15 @@ module VagrantPlugins
           if not vdi_ref_rec
 
             # Find out virtual size of the VHD
-            disk_info=JSON.parse(IO.popen(["qemu-img", "info",box_vhd_file,"--output=json"]).read)
+            disk_info={}
+            begin
+              disk_info=JSON.parse(IO.popen(["qemu-img", "info",box_vhd_file]).read) 
+            rescue JSON::ParserError
+              size=`qemu-img info #{box_vhd_file} | grep "virtual size" | cut "-d(" -f2 | cut "-d " -f1`
+              disk_info['virtual-size']=size.strip
+            end
             virtual_size = disk_info['virtual-size']
-            
+            @logger.info("virtual_size=#{virtual_size}")
             pool=env[:xc].call("pool.get_all",env[:session])['Value'][0]
             default_sr=env[:xc].call("pool.get_default_SR",env[:session],pool)['Value']
           @logger.info("default_SR="+default_sr)
