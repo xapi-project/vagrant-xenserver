@@ -40,7 +40,7 @@ module VagrantPlugins
             # Find out virtual size of the VHD
             disk_info={}
             begin
-              disk_info=JSON.parse(IO.popen(["qemu-img", "info",box_vhd_file]).read) 
+              disk_info=JSON.parse(IO.popen(["qemu-img", "info",box_vhd_file,"--output=json"]).read) 
             rescue JSON::ParserError
               size=`qemu-img info #{box_vhd_file} | grep "virtual size" | cut "-d(" -f2 | cut "-d " -f1`
               disk_info['virtual-size']=size.strip
