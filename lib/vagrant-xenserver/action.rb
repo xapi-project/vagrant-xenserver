@@ -88,6 +88,32 @@ module VagrantPlugins
         end
       end
 
+      def self.action_ssh_run
+        Vagrant::Action::Builder.new.tap do |b|
+          @logger.info("XXXXX SSH")
+          b.use ConfigValidate
+          b.use Call, IsCreated do | env, b2|
+            if !env[:result]
+#              b2.use MessageNotCreated
+              @logger.info("MessageNotCreate")
+              next
+            end
+
+            b2.use ConnectXS
+            b2.use Call, IsRunning do |env2, b3|
+              if !env2[:result]
+                #b3.use MessageNotRunning
+                @logger.info("MessageNotCreate")
+                next
+              end
+
+              b3.use SSHRun
+              @logger.info("ssh run")
+            end
+          end
+        end
+      end
+
       def self.action_provision
         Vagrant::Action::Builder.new.tap do |b|
           @logger.info("XXXXX provision")
