@@ -1,3 +1,7 @@
+# 0.0.3 (8 July 2014)
+
+* Enable vagrant ssh -c
+
 # 0.0.2 (7 July 2014)
 
 * Support older versions of qemu-img that don't output
