@@ -19,13 +19,13 @@ module VagrantPlugins
               b2.use CloneDisk
               b2.use CreateVM
               b2.use Provision
+              b2.use PrepareNFSValidIds
+              b2.use SyncedFolderCleanup
+              b2.use SyncedFolders
               b2.use StartVM
               b2.use WaitForCommunicator, ["Running"]
+              b2.use PrepareNFSSettings
 
-#              b2.use ForwardPorts
-#              b2.use PrepareNFSSettings
-#              b2.use ShareFolders
-#              b2.use SetHostname
             end
           end
         end
@@ -150,6 +150,8 @@ module VagrantPlugins
       autoload :DestroyVM, action_root.join('destroy_vm')
       autoload :StartVM, action_root.join('start_vm')
       autoload :ReadSSHInfo, action_root.join('read_ssh_info')
+      autoload :PrepareNFSSettings, action_root.join('prepare_nfs_settings')
+      autoload :PrepareNFSValidIds, action_root.join('prepare_nfs_valid_ids')
     end
   end
 end
