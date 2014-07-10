@@ -6,7 +6,7 @@ module VagrantPlugins
       class ReadState
         def initialize(app, env)
           @app = app
-          @logger = Log4r::Logger.new("vagrant::xenserver::actions::readstate")
+          @logger = Log4r::Logger.new("vagrant::xenserver::actions::read_state")
         end
 
         def call(env)

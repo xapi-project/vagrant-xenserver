@@ -9,7 +9,7 @@ module VagrantPlugins
       class UploadXVA
         def initialize(app, env)
           @app = app
-          @logger = Log4r::Logger.new("vagrant::xenserver::actions::upload_xva")
+          @logger = Log4r::Logger.new("vagrant::xenserver::actions::maybe_upload_disk")
         end
         
         def call(env)
