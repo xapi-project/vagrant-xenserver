@@ -1,3 +1,8 @@
+# 0.0.4 (10 July 2014)
+
+* Enable NFS synced folders
+* Add the halt action
+
 # 0.0.3 (8 July 2014)
 
 * Enable vagrant ssh -c
