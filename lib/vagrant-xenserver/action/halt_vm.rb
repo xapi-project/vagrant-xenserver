@@ -7,7 +7,7 @@ module VagrantPlugins
       class HaltVM
         def initialize(app, env)
           @app = app
-          @logger = Log4r::Logger.new("vagrant::xenserver::actions::start_vm")
+          @logger = Log4r::Logger.new("vagrant::xenserver::actions::halt_vm")
         end
         
         def call(env)

@@ -10,7 +10,7 @@ module VagrantPlugins
       class CloneDisk
         def initialize(app, env)
           @app = app
-          @logger = Log4r::Logger.new("vagrant::xenserver::actions::upload_xva")
+          @logger = Log4r::Logger.new("vagrant::xenserver::actions::clone_disk")
         end
         
         def call(env)
