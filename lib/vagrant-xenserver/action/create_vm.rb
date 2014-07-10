@@ -3,6 +3,7 @@ require "xmlrpc/client"
 require "vagrant-xenserver/util/uploader"
 require "rexml/document"
 require "json"
+require "etc"
 
 module VagrantPlugins
   module XenServer
@@ -22,10 +23,17 @@ module VagrantPlugins
           (himn_ref,himn_rec) = himn
 
           @logger.info("himn_uuid="+himn_rec['uuid'])
-
+          
+          username = Etc.getlogin
+          
           oim = env[:xc].call("VM.get_by_name_label",env[:session],"Other install media")['Value'][0]
 
-          vm_ref = env[:xc].call("VM.clone",env[:session],oim,env[:machine].box.name.to_s)['Value']
+          box_name = env[:machine].box.name.to_s
+          box_version = env[:machine].box.version.to_s
+
+          vm_name = "#{username}/#{box_name}/#{box_version}"
+
+          vm_ref = env[:xc].call("VM.clone",env[:session],oim,vm_name)['Value']
 
           vbd_record = {
             'VM' => vm_ref,

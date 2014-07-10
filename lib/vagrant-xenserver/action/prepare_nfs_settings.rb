@@ -14,9 +14,7 @@ module VagrantPlugins
 
         def call(env)
           @machine = env[:machine]
-          @logger.info("XXXXXX Here!")
           @app.call(env)          
-          @logger.info("XXXXXX now Here!")
 
           if using_nfs?
             @logger.info("Using NFS, preparing NFS settings by reading host IP and machine IP")
@@ -33,11 +31,10 @@ module VagrantPlugins
         # we are not using NFS we don't need to do the extra work to
         # populate these fields in the environment.
         def using_nfs?
-          true
-#          !!synced_folders(@machine)[:nfs]
+          !!synced_folders(@machine)[:nfs]
         end
 
-        # Returns the IP address of the first host only network adapter
+        # Returns the IP address of the interface that will route to the xs_host
         #
         # @param [Machine] machine
         # @return [String]

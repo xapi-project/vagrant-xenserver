@@ -9,7 +9,6 @@ module VagrantPlugins
 
         def call(env)
           env[:nfs_valid_ids] = env[:xc].call("VM.get_all",env[:session])['Value']
-          @logger.info("XXXXXXX nfs valid ids!")
           @app.call(env)
         end
       end

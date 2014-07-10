@@ -7,6 +7,18 @@ module VagrantPlugins
       include Vagrant::Action::Builtin
       @logger = Log4r::Logger.new('vagrant::xenserver::action')
 
+      def self.action_boot
+	Vagrant::Action::Builder.new.tap do |b| 
+          b.use Provision
+          b.use PrepareNFSValidIds
+          b.use SyncedFolderCleanup
+          b.use SyncedFolders
+          b.use StartVM
+          b.use WaitForCommunicator, ["Running"]
+          b.use PrepareNFSSettings         
+        end
+      end
+      
       def self.action_up
 	Vagrant::Action::Builder.new.tap do |b|
           b.use HandleBox
@@ -18,14 +30,27 @@ module VagrantPlugins
               b2.use UploadVHD
               b2.use CloneDisk
               b2.use CreateVM
-              b2.use Provision
-              b2.use PrepareNFSValidIds
-              b2.use SyncedFolderCleanup
-              b2.use SyncedFolders
-              b2.use StartVM
-              b2.use WaitForCommunicator, ["Running"]
-              b2.use PrepareNFSSettings
-
+            end
+            b2.use action_boot
+          end
+        end
+      end
+      
+      def self.action_halt
+        Vagrant::Action::Builder.new.tap do |b|
+          b.use ConfigValidate
+          b.use Call, IsCreated do |env, b2|
+            if !env[:result]
+              @logger.info "MessageNotCreated"
+              next
+            end
+            b2.use ConnectXS
+            b2.use Call, IsRunning do |env, b3|
+              if !env[:result]
+                @logger.info "Not running"
+                next
+              end
+              b3.use HaltVM            
             end
           end
         end
@@ -39,7 +64,6 @@ module VagrantPlugins
               @logger.info "MessageNotCreated"
               next
             end
-            
             b2.use ConnectXS
             b2.use DestroyVM
           end
@@ -149,6 +173,7 @@ module VagrantPlugins
       autoload :CreateVM, action_root.join('create_vm')
       autoload :DestroyVM, action_root.join('destroy_vm')
       autoload :StartVM, action_root.join('start_vm')
+      autoload :HaltVM, action_root.join('halt_vm')
       autoload :ReadSSHInfo, action_root.join('read_ssh_info')
       autoload :PrepareNFSSettings, action_root.join('prepare_nfs_settings')
       autoload :PrepareNFSValidIds, action_root.join('prepare_nfs_valid_ids')
