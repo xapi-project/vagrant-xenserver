@@ -1,6 +1,7 @@
 # 0.0.5 (5 September 2014)
 
 * Upload VHDs over https rather than http
+* Suspend/Resume (Simon Beaumont)
 
 # 0.0.4 (10 July 2014)
 
