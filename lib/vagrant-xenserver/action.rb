@@ -56,6 +56,46 @@ module VagrantPlugins
         end
       end
 
+      def self.action_suspend
+        Vagrant::Action::Builder.new.tap do |b|
+          b.use ConfigValidate
+          b.use Call, IsCreated do |env, b2|
+            if !env[:result]
+              @logger.info "MessageNotCreated"
+              next
+            end
+            b2.use ConnectXS
+            b2.use Call, IsRunning do |env, b3|
+              if !env[:result]
+                @logger.info "Not running"
+                next
+              end
+              b3.use SuspendVM
+            end
+          end
+        end
+      end
+
+      def self.action_resume
+        Vagrant::Action::Builder.new.tap do |b|
+          b.use ConfigValidate
+          b.use Call, IsCreated do |env, b2|
+            if !env[:result]
+              @logger.info "MessageNotCreated"
+              next
+            end
+            b2.use ConnectXS
+            b2.use Call, IsSuspended do |env, b3|
+              if !env[:result]
+                @logger.info "Not suspended"
+                next
+              end
+              b3.use ResumeVM
+            end
+          end
+        end
+      end
+
       def self.action_destroy
         Vagrant::Action::Builder.new.tap do |b|
           b.use ConfigValidate
@@ -167,6 +207,7 @@ module VagrantPlugins
       autoload :ReadState, action_root.join('read_state')
       autoload :IsCreated, action_root.join('is_created')
       autoload :IsRunning, action_root.join('is_running')
+      autoload :IsSuspended, action_root.join('is_suspended')
       autoload :UploadXVA, action_root.join('upload_xva')
       autoload :UploadVHD, action_root.join('upload_vhd')
       autoload :CloneDisk, action_root.join('clone_disk')
@@ -174,6 +215,8 @@ module VagrantPlugins
       autoload :DestroyVM, action_root.join('destroy_vm')
       autoload :StartVM, action_root.join('start_vm')
       autoload :HaltVM, action_root.join('halt_vm')
+      autoload :SuspendVM, action_root.join('suspend_vm')
+      autoload :ResumeVM, action_root.join('resume_vm')
       autoload :ReadSSHInfo, action_root.join('read_ssh_info')
       autoload :PrepareNFSSettings, action_root.join('prepare_nfs_settings')
       autoload :PrepareNFSValidIds, action_root.join('prepare_nfs_valid_ids')

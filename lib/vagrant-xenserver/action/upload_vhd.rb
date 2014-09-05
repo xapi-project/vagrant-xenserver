@@ -10,7 +10,7 @@ module VagrantPlugins
       class UploadVHD
         def initialize(app, env)
           @app = app
-          @logger = Log4r::Logger.new("vagrant::xenserver::actions::upload_xva")
+          @logger = Log4r::Logger.new("vagrant::xenserver::actions::upload_vhd")
         end
         
         def call(env)
