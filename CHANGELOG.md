@@ -1,3 +1,7 @@
+# 0.0.6 (8 September 2014)
+
+* Change other uploaders to https too
+
 # 0.0.5 (5 September 2014)
 
 * Upload VHDs over https rather than http

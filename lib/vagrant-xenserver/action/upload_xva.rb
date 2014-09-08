@@ -31,7 +31,7 @@ module VagrantPlugins
 
           task = task_result["Value"]
 
-          url = "http://#{hostname}/import?session_id=#{session}&task_id=#{task}"
+          url = "https://#{hostname}/import?session_id=#{session}&task_id=#{task}"
 
           uploader_options = {}
           uploader_options[:ui] = env[:ui]
