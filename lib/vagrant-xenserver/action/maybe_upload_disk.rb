@@ -35,7 +35,8 @@ module VagrantPlugins
 
           uploader_options = {}
           uploader_options[:ui] = env[:ui]
-
+          uploader_options[:insecure] = True
+          
           uploader = MyUtil::Uploader.new(box_image_file, url, uploader_options)
 
           begin

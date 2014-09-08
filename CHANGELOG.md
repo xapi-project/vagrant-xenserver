@@ -1,3 +1,7 @@
+# 0.0.7 (8 September 2014)
+
+* Use --insecure when uploading, as XS uses self-signed certs
+
 # 0.0.6 (8 September 2014)
 
 * Change other uploaders to https too
