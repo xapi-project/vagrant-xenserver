@@ -1,3 +1,7 @@
+# 0.0.8 (8 September 2014)
+
+* Correct typos
+
 # 0.0.7 (8 September 2014)
 
 * Use --insecure when uploading, as XS uses self-signed certs

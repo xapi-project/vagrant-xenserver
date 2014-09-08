@@ -83,7 +83,7 @@ module VagrantPlugins
             
             uploader_options = {}
             uploader_options[:ui] = env[:ui]
-            uploader_options[:insecure] = True
+            uploader_options[:insecure] = true
             
             uploader = MyUtil::Uploader.new(box_vhd_file, url, uploader_options)
             
