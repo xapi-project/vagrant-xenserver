@@ -20,7 +20,7 @@ module VagrantPlugins
 
           env[:my_vdi] = clone
 
-          @logger.info("clone VDI="+clone)
+          @logger.info("clone VDI=#{clone}")
 
           @app.call(env)
         end
