@@ -41,8 +41,11 @@ module VagrantPlugins
         def read_host_ip(machine,env)
           ip = Socket.getaddrinfo(env[:machine].provider_config.xs_host,nil)[0][2]
           env[:xs_host_ip] = ip
-          re = /src ([0-9\.]+)/
-          match = `ip route get to #{ip} | head -n 1`.match re
+          re = /interface: ([a-z0-9]+)/
+          match = `route get #{ip} | grep interface | head -n 1`.match re
+          interface = match[1]
+          re = /inet ([0-9\.]+)/
+          match = `ifconfig #{interface} inet | tail -1`.match re
           match[1]
         end
       end
