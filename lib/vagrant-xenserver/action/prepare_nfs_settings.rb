@@ -1,5 +1,25 @@
 require 'nokogiri'
 require 'socket'
+require 'rbconfig'
+
+def os
+    @os ||= (
+      host_os = RbConfig::CONFIG['host_os']
+      case host_os
+      when /mswin|msys|mingw|cygwin|bccwin|wince|emc/
+        :windows
+      when /darwin|mac os/
+        :macosx
+      when /linux/
+        :linux
+      when /solaris|bsd/
+        :unix
+      else
+        raise Vagrant::Errors::UnknownOS # "unknown os: #{host_os.inspect}"
+      end
+    )
+  end
+
 
 module VagrantPlugins
   module XenServer
@@ -41,9 +61,23 @@ module VagrantPlugins
         def read_host_ip(machine,env)
           ip = Socket.getaddrinfo(env[:machine].provider_config.xs_host,nil)[0][2]
           env[:xs_host_ip] = ip
-          re = /src ([0-9\.]+)/
-          match = `ip route get to #{ip} | head -n 1`.match re
-          match[1]
+          def get_local_ip_linux(ip)
+            re = /src ([0-9\.]+)/
+            match = `ip route get to #{ip} | head -n 1`.match re
+            match[1]
+          end
+          def get_local_ip_mac(ip)
+            re = /interface: ([a-z0-9]+)/
+            match = `route get #{ip} | grep interface | head -n 1`.match re
+            interface = match[1]
+            re = /inet ([0-9\.]+)/
+            match = `ifconfig #{interface} inet | tail -1`.match re
+            match[1]
+          end
+          if os == :linux then get_local_ip_linux(ip)
+          elsif os == :macosx then get_local_ip_mac(ip)
+          else raise Vagrant::Errors::UnknownOS # "unknown os: #{host_os.inspect}"
+          end 
         end
       end
     end

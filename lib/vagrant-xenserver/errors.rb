@@ -23,6 +23,9 @@ module VagrantPlugins
         error_key(:api_error)
       end
 
+      class UnknownOS < VagrantXenServerError
+        error_key(:unknown_os)
+      end
     end
   end
 end
