@@ -106,6 +106,9 @@ module VagrantPlugins
             end
             b2.use ConnectXS
             b2.use DestroyVM
+            b2.use ProvisionerCleanup
+            b2.use PrepareNFSValidIds
+            b2.use SyncedFolderCleanup
           end
         end
       end
