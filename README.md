@@ -9,8 +9,6 @@ control and provision machines on a XenServer host.
 ## Installation
 ```shell
 vagrant plugin install vagrant-xenserver
-# Make your linux box look like a Mac :) (maybe)
-sudo ln -s /bin/tar /bin/bsdtar
 ```
 
 ## XenServer host setup
@@ -20,7 +18,7 @@ N.B. Currently this will only work on a trunk build of XenServer:
 yum install --enablerepo=base,extras --disablerepo=citrix -y nc
 # Setup NAT - NB, this _disable the firewall_ - be careful!
 echo 1 > /proc/sys/net/ipv4/ip_forward
-/sbin/iptables -F INPUT
+/sbin/iptables -F
 
 /sbin/iptables -t nat -A POSTROUTING -o xenbr0 -j MASQUERADE
 /sbin/iptables -A INPUT -i xenbr0 -p tcp -m tcp --dport 53 -j ACCEPT
