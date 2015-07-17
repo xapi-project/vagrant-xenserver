@@ -30,6 +30,7 @@ module VagrantPlugins
               b2.use UploadVHD
               b2.use CloneDisk
               b2.use CreateVM
+              b2.use CreateVIFs
             end
             b2.use action_boot
           end
@@ -205,6 +206,7 @@ module VagrantPlugins
       end
 
       action_root = Pathname.new(File.expand_path('../action', __FILE__))
+      autoload :CreateVIFs, action_root.join("create_vifs")
       autoload :ConnectXS, action_root.join("connect_xs")
       autoload :DummyMessage, action_root.join('dummy')
       autoload :ReadState, action_root.join('read_state')
