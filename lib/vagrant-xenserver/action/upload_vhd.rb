@@ -8,6 +8,9 @@ module VagrantPlugins
   module XenServer
     module Action
       class UploadVHD
+
+        @@lock = Mutex.new
+
         def initialize(app, env)
           @app = app
           @logger = Log4r::Logger.new("vagrant::xenserver::actions::upload_vhd")
@@ -36,7 +39,7 @@ module VagrantPlugins
             }
           
           if not vdi_ref_rec
-
+            @@lock.synchronize do
             # Find out virtual size of the VHD
             disk_info={}
             begin
@@ -49,7 +52,7 @@ module VagrantPlugins
             @logger.info("virtual_size=#{virtual_size}")
             pool=env[:xc].call("pool.get_all",env[:session])['Value'][0]
             default_sr=env[:xc].call("pool.get_default_SR",env[:session],pool)['Value']
-          @logger.info("default_SR="+default_sr)
+            @logger.info("default_SR="+default_sr)
             vdi_record = {
               'name_label' => 'Vagrant disk',
               'name_description' => 'Base disk uploaded for the vagrant box '+env[:machine].box.name.to_s+' v'+env[:machine].box.version.to_s,
@@ -111,10 +114,10 @@ module VagrantPlugins
               raise Errors::APIError
             end
             
-          task_result_result = env[:xc].call("task.get_result",env[:session],task)
-          if task_result_result["Status"] != "Success"
-            raise Errors::APIError
-          end
+            task_result_result = env[:xc].call("task.get_result",env[:session],task)
+            if task_result_result["Status"] != "Success"
+              raise Errors::APIError
+            end
             
             task_result = task_result_result["Value"]
             
@@ -130,6 +133,7 @@ module VagrantPlugins
             @logger.info("task_result=" + tag_result.to_s)
 
             env[:box_vdi] = vdi_result
+            end
           else
             (reference,record) = vdi_ref_rec
             env[:box_vdi] = reference

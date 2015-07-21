@@ -19,7 +19,7 @@ module VagrantPlugins
         Config
       end
 
-      provider('xenserver') do
+      provider('xenserver', parallel: true) do
 	require_relative "provider"
         Provider
       end
