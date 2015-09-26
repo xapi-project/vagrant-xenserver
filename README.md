@@ -27,6 +27,11 @@ echo 1 > /proc/sys/net/ipv4/ip_forward
 /sbin/iptables -A FORWARD -i xenapi -o xenbr0 -j ACCEPT
 ```
 
+You will also need to copy your ssh key to the Xenserver host:
+
+    ssh-copy-id root@xenserver
+
+
 # Usage
 
 ## Converting a VirtualBox box file
