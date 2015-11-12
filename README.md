@@ -22,6 +22,7 @@ You will also need to copy your ssh key to the Xenserver host:
 
     ssh-copy-id root@xenserver
 
+Make sure the default_SR is set, and that a VHD-based SR is in use. Currently the NFS SR is the recommended storage type.
 
 # Usage
 
