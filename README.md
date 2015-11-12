@@ -5,6 +5,7 @@ control and provision machines on a XenServer host.
 
 ## Dependencies
 * Vagrant >= 1.5(?) (http://www.vagrantup.com/downloads.html)
+* qemu-img
 
 ## Installation
 ```shell
