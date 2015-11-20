@@ -5,6 +5,7 @@ control and provision machines on a XenServer host.
 
 ## Dependencies
 * Vagrant >= 1.5(?) (http://www.vagrantup.com/downloads.html)
+* qemu-img
 
 ## Installation
 ```shell
@@ -12,20 +13,17 @@ vagrant plugin install vagrant-xenserver
 ```
 
 ## XenServer host setup
-N.B. Currently this will only work on a trunk build of XenServer:
+N.B. Currently this will only work on XenServer 6.5 and later:
 ```shell
 # Install netcat
 yum install --enablerepo=base,extras --disablerepo=citrix -y nc
-# Setup NAT - NB, this _disable the firewall_ - be careful!
-echo 1 > /proc/sys/net/ipv4/ip_forward
-/sbin/iptables -F
-
-/sbin/iptables -t nat -A POSTROUTING -o xenbr0 -j MASQUERADE
-/sbin/iptables -A INPUT -i xenbr0 -p tcp -m tcp --dport 53 -j ACCEPT
-/sbin/iptables -A INPUT -i xenbr0 -p udp -m udp --dport 53 -j ACCEPT
-/sbin/iptables -A FORWARD -i xenbr0 -o xenapi -m state --state RELATED,ESTABLISHED -j ACCEPT
-/sbin/iptables -A FORWARD -i xenapi -o xenbr0 -j ACCEPT
 ```
+
+You will also need to copy your ssh key to the Xenserver host:
+
+    ssh-copy-id root@xenserver
+
+Make sure the default_SR is set, and that a VHD-based SR is in use. Currently the NFS SR is the recommended storage type.
 
 # Usage
 
@@ -78,11 +76,12 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   xs.pv = true
   xs.memory = 2048
   end
+  config.vm.network "public_network", bridge: "xenbr0"
 end
 
 ```
-
-and then you can do
+Note that by default there will be no connection to the external network, so most configurations will require a 'public_network' defined as in the above Vagrantfile.
+To bring the VM up, it should then be as simple as
 
 ```shell
 vagrant up --provider=xenserver
