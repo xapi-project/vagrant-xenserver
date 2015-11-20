@@ -20,8 +20,16 @@ module VagrantPlugins
       end
 
       provider('xenserver', parallel: true) do
+        setup_i18n
+
 	require_relative "provider"
         Provider
+      end
+
+      def self.setup_i18n
+        I18n.load_path << File.expand_path('locales/en.yml',
+                                           XenServer.source_root)
+        I18n.reload!
       end
     end
   end
