@@ -7,4 +7,10 @@ en:
         The XenServer username must be defined via "xs_username"
       password_required: |-
         The password for the XenServer username must be defined via "xs_password"
-
+    errors:
+      login_error: |-
+        Failed to login to the XenServer. Check the "xs_username" and "xs_password" parameters
+      qemuimg_error: |-
+        Failure executing qemu-img. Check that it is installed and working, and that the VHD file referenced is valid.
+      nodefaultsr_error: |-
+        Failed to find a valid default SR for the pool. Please set one.

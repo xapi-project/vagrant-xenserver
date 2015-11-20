@@ -26,6 +26,14 @@ module VagrantPlugins
       class UnknownOS < VagrantXenServerError
         error_key(:unknown_os)
       end
+
+      class QemuImgError < VagrantXenServerError
+        error_key(:qemuimg_error)
+      end
+
+      class NoDefaultSR < VagrantXenServerError
+        error_key(:nodefaultsr_error)
+      end
     end
   end
 end

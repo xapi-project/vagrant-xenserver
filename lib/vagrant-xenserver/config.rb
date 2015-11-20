@@ -34,6 +34,7 @@ module VagrantPlugins
         @xs_password = UNSET_VALUE
         @pv = UNSET_VALUE
         @memory = UNSET_VALUE
+	@xva_url = UNSET_VALUE
       end
 
       def finalize!
@@ -42,6 +43,7 @@ module VagrantPlugins
         @xs_password = nil if @xs_password == UNSET_VALUE
         @pv = nil if @pv == UNSET_VALUE
         @memory = 1024 if @memory == UNSET_VALUE
+	@xva_url = nil if @xva_url = UNSET_VALUE
       end
 
       def validate(machine)
