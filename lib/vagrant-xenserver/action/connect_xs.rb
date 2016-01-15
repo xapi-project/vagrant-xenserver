@@ -12,7 +12,12 @@ module VagrantPlugins
 
         def call(env)
           if not env[:session]
-            env[:xc] = XMLRPC::Client.new(env[:machine].provider_config.xs_host, "/", "80")
+            env[:xc] = XMLRPC::Client.new3({
+              'host' => env[:machine].provider_config.xs_host,
+              'path' => "/",
+              'port' => env[:machine].provider_config.xs_port,
+              'use_ssl' => env[:machine].provider_config.xs_use_ssl
+            })
             
             @logger.info("Connecting to XenServer")
             
