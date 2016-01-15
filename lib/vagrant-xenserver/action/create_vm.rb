@@ -31,7 +31,11 @@ module VagrantPlugins
           box_name = env[:machine].box.name.to_s
           box_version = env[:machine].box.version.to_s
 
-          vm_name = "#{username}/#{box_name}/#{box_version}"
+          if env[:machine].provider_config.name.nil?
+            vm_name = "#{username}/#{box_name}/#{box_version}"
+          else
+            vm_name = env[:machine].provider_config.name
+          end
 
           vm_ref = env[:xc].call("VM.clone",env[:session],oim,vm_name)['Value']
 
