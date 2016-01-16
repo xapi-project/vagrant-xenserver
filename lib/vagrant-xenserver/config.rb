@@ -8,6 +8,16 @@ module VagrantPlugins
       # @return [String]
       attr_accessor :xs_host
 
+      # The port to communicate with the API on XenServer
+      #
+      # @return [Int]
+      attr_accessor :xs_port
+
+      # True if the API should be accessed over SSL/TLS
+      #
+      # @return [Bool]
+      attr_accessor :xs_use_ssl
+
       # The XenServer username
       #
       # @return [String]
@@ -30,6 +40,8 @@ module VagrantPlugins
 
       def initialize
         @xs_host = UNSET_VALUE
+        @xs_port = UNSET_VALUE
+        @xs_use_ssl = UNSET_VALUE
         @xs_username = UNSET_VALUE
         @xs_password = UNSET_VALUE
         @pv = UNSET_VALUE
@@ -39,6 +51,8 @@ module VagrantPlugins
 
       def finalize!
         @xs_host = nil if @xs_host == UNSET_VALUE
+        @xs_port = 80 if @xs_port == UNSET_VALUE
+        @xs_use_ssl = false if @xs_use_ssl == UNSET_VALUE
         @xs_username = nil if @xs_username == UNSET_VALUE
         @xs_password = nil if @xs_password == UNSET_VALUE
         @pv = nil if @pv == UNSET_VALUE
