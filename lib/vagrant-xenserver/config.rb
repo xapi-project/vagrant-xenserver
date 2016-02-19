@@ -28,6 +28,11 @@ module VagrantPlugins
       # @return [String]
       attr_accessor :xs_password
 
+      # Name of the VM
+      #
+      # @return [String]
+      attr_accessor :name
+
       # True if the VM should be PV
       #
       # @return [Bool]
@@ -44,6 +49,7 @@ module VagrantPlugins
         @xs_use_ssl = UNSET_VALUE
         @xs_username = UNSET_VALUE
         @xs_password = UNSET_VALUE
+        @name = UNSET_VALUE
         @pv = UNSET_VALUE
         @memory = UNSET_VALUE
 	@xva_url = UNSET_VALUE
@@ -55,6 +61,7 @@ module VagrantPlugins
         @xs_use_ssl = false if @xs_use_ssl == UNSET_VALUE
         @xs_username = nil if @xs_username == UNSET_VALUE
         @xs_password = nil if @xs_password == UNSET_VALUE
+        @name = nil if @name == UNSET_VALUE
         @pv = nil if @pv == UNSET_VALUE
         @memory = 1024 if @memory == UNSET_VALUE
 	@xva_url = nil if @xva_url = UNSET_VALUE
