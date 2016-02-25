@@ -19,6 +19,7 @@ module VagrantPlugins
 
             if type == :public_network then
               bridge = options[:bridge]
+              mac = options[:mac] || ''
 
               networks = env[:xc].call("network.get_all_records",env[:session])['Value']
 
@@ -31,7 +32,7 @@ module VagrantPlugins
                 'VM' => myvm,
                 'network' => net_ref,
                 'device' => vif_devices[0],
-                'MAC' => '',
+                'MAC' => mac,
                 'MTU' => '1500',
                 'other_config' => {},
                 'qos_algorithm_type' => '',
