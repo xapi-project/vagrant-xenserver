@@ -38,6 +38,11 @@ module VagrantPlugins
       # @return [Bool]
       attr_accessor :pv
 
+      # Timeout for commands sent to XenServer
+      #
+      # @return [Int]
+      attr_accessor :api_timeout
+
       # Memory settings
       #
       # @return [Int]
@@ -51,8 +56,9 @@ module VagrantPlugins
         @xs_password = UNSET_VALUE
         @name = UNSET_VALUE
         @pv = UNSET_VALUE
+        @api_timeout = UNSET_VALUE
         @memory = UNSET_VALUE
-	@xva_url = UNSET_VALUE
+        @xva_url = UNSET_VALUE
       end
 
       def finalize!
@@ -63,8 +69,9 @@ module VagrantPlugins
         @xs_password = nil if @xs_password == UNSET_VALUE
         @name = nil if @name == UNSET_VALUE
         @pv = nil if @pv == UNSET_VALUE
+        @api_timeout = 60 if @api_timeout = UNSET_VALUE
         @memory = 1024 if @memory == UNSET_VALUE
-	@xva_url = nil if @xva_url = UNSET_VALUE
+        @xva_url = nil if @xva_url = UNSET_VALUE
       end
 
       def validate(machine)

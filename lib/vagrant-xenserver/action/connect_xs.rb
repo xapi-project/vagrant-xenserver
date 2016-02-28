@@ -12,16 +12,17 @@ module VagrantPlugins
 
         def call(env)
           if not env[:session]
+            config = env[:machine].provider_config
             env[:xc] = XMLRPC::Client.new3({
-              'host' => env[:machine].provider_config.xs_host,
+              'host' => config.xs_host,
               'path' => "/",
-              'port' => env[:machine].provider_config.xs_port,
-              'use_ssl' => env[:machine].provider_config.xs_use_ssl
+              'port' => config.xs_port,
+              'use_ssl' => config.xs_use_ssl
             })
+            env[:xc].timeout = config.api_timeout unless config.api_timeout.nil?
             
             @logger.info("Connecting to XenServer")
-            
-            sess_result = env[:xc].call("session.login_with_password", env[:machine].provider_config.xs_username, env[:machine].provider_config.xs_password,"1.0")
+            sess_result = env[:xc].call("session.login_with_password", config.xs_username, config.xs_password,"1.0")
             
             if sess_result["Status"] != "Success"
               raise Errors::LoginError
