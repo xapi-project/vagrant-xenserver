@@ -1,5 +1,6 @@
 require "log4r"
-require "xmlrpc/client"
+require "xenapi"
+require "uri"
 
 module VagrantPlugins
   module XenServer
@@ -7,28 +8,29 @@ module VagrantPlugins
       class ConnectXS
         def initialize(app, env)
           @app = app
-          @logger = Log4r::Logger.new("vagrant_xenserver::actions::connect_xs")
+          @logger = Log4r::Logger.new("vagrant::xenserver::actions::connect_xs")
         end
 
         def call(env)
-          if not env[:session]
+          if not env[:xc]
             config = env[:machine].provider_config
-            env[:xc] = XMLRPC::Client.new3({
-              'host' => config.xs_host,
-              'path' => "/",
-              'port' => config.xs_port,
-              'use_ssl' => config.xs_use_ssl
-            })
-            env[:xc].timeout = config.api_timeout unless config.api_timeout.nil?
-            
+            uri = URI::Generic.new(config.xs_use_ssl ? 'https' : 'http',
+                                nil,
+                                config.xs_host,
+                                config.xs_port,
+                                nil,
+                                "/",
+                                nil,
+                                nil, nil)
+            env[:xc] = XenApi::Client.new(uri.to_s, timeout = config.api_timeout)
+
             @logger.info("Connecting to XenServer")
-            sess_result = env[:xc].call("session.login_with_password", config.xs_username, config.xs_password,"1.0")
-            
-            if sess_result["Status"] != "Success"
+
+            if not env[:xc].login_with_password(config.xs_username, config.xs_password)
               raise Errors::LoginError
             end
-            
-            env[:session] = sess_result["Value"]
+
+            @logger.info("Connected to XenServer")
           end
 
           @app.call(env)
