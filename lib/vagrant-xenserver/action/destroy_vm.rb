@@ -11,8 +11,11 @@ module VagrantPlugins
         end
         
         def call(env)
-          env[:xc].VM.hard_shutdown(env[:machine].id)
-          
+          begin
+            env[:xc].VM.hard_shutdown(env[:machine].id)
+          rescue
+          end
+
           vbds = env[:xc].VM.get_VBDs(env[:machine].id)
           
           vbds.each { |vbd| 
