@@ -13,11 +13,11 @@ module VagrantPlugins
         def call(env)
           myvm = env[:machine].id
           
-          suspend_task = env[:xc].call("Async.VM.suspend",env[:session],myvm)['Value']
-          while env[:xc].call("task.get_status",env[:session],suspend_task)['Value'] == 'pending' do
+          suspend_task = env[:xc].Async.VM.suspend(myvm)
+          while env[:xc].task.get_status(suspend_task) == 'pending' do
               sleep 1
           end
-          suspend_result = env[:xc].call("task.get_status",env[:session],suspend_task)['Value']
+          suspend_result = env[:xc].task.get_status(suspend_task)
           if suspend_result != "success"
             raise Errors::APIError
           end

@@ -17,7 +17,7 @@ module VagrantPlugins
         def call(env)
           vdi_ref = env[:my_vdi]
           
-          networks = env[:xc].call("network.get_all_records",env[:session])['Value']
+          networks = env[:xc].network.get_all_records
 
           himn = networks.find { |ref,net| net['other_config']['is_host_internal_management_network'] }
           (himn_ref,himn_rec) = himn
@@ -26,7 +26,7 @@ module VagrantPlugins
           
           username = Etc.getlogin
           
-          oim = env[:xc].call("VM.get_by_name_label",env[:session],"Other install media")['Value'][0]
+          oim = env[:xc].VM.get_by_name_label("Other install media")[0]
 
           box_name = env[:machine].box.name.to_s
           box_version = env[:machine].box.version.to_s
@@ -37,7 +37,7 @@ module VagrantPlugins
             vm_name = env[:machine].provider_config.name
           end
 
-          vm_ref = env[:xc].call("VM.clone",env[:session],oim,vm_name)['Value']
+          vm_ref = env[:xc].VM.clone(oim,vm_name)
 
           vbd_record = {
             'VM' => vm_ref,
@@ -53,7 +53,7 @@ module VagrantPlugins
             'qos_algorithm_params' => {}
           }
 
-          vbd_res = env[:xc].call("VBD.create",env[:session],vbd_record)
+          vbd_res = env[:xc].VBD.create(vbd_record)
           
           @logger.info("vbd_res=" + vbd_res.to_s)
 
@@ -71,19 +71,19 @@ module VagrantPlugins
             'ipv6_allowed' => []
           }
 
-          vif_res = env[:xc].call("VIF.create",env[:session],vif_record)
+          vif_res = env[:xc].VIF.create(vif_record)
           
           @logger.info("vif_res=" + vif_res.to_s)
 
           if env[:machine].provider_config.pv
-            env[:xc].call("VM.set_HVM_boot_policy",env[:session],vm_ref,"")
-            env[:xc].call("VM.set_PV_bootloader",env[:session],vm_ref,"pygrub")
+            env[:xc].VM.set_HVM_boot_policy(vm_ref,"")
+            env[:xc].VM.set_PV_bootloader(vm_ref,"pygrub")
           end
 
           mem = ((env[:machine].provider_config.memory) * (1024*1024)).to_s
 
-          env[:xc].call("VM.set_memory_limits",env[:session],vm_ref,mem,mem,mem,mem)
-          env[:xc].call("VM.provision",env[:session],vm_ref)
+          env[:xc].VM.set_memory_limits(vm_ref,mem,mem,mem,mem)
+          env[:xc].VM.provision(vm_ref)
 
           env[:machine].id = vm_ref
 

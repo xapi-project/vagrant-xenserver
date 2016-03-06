@@ -22,16 +22,10 @@ module VagrantPlugins
           @logger.info("box version=" + env[:machine].box.version.to_s)
 
           # Create a task to so we can get the result of the upload
-          task_result = env[:xc].call("task.create", env[:session], "vagrant-xva-upload",
-                        "Task to track progress of the XVA upload from vagrant")
-          
-          if task_result["Status"] != "Success"
-            raise Errors::APIError
-          end
+          task = env[:xc].task.create("vagrant-xva-upload",
+                                      "Task to track progress of the XVA upload from vagrant")
 
-          task = task_result["Value"]
-
-          url = "https://#{hostname}/import?session_id=#{session}&task_id=#{task}"
+          url = "https://#{hostname}/import?session_id=#{env[:xc].xenapi_session}&task_id=#{task}"
 
           uploader_options = {}
           uploader_options[:ui] = env[:ui]
@@ -50,11 +44,7 @@ module VagrantPlugins
 
           begin
             sleep(0.2)
-            task_status_result = env[:xc].call("task.get_status",env[:session],task)
-            if task_status_result["Status"] != "Success"
-              raise Errors::APIError
-            end
-            task_status = task_status_result["Value"]
+            task_status = env[:xc].task.get_status(task)
           end while task_status == "pending"
 
           @logger.info("task_status="+task_status)
@@ -63,12 +53,7 @@ module VagrantPlugins
             raise Errors::APIError
           end
 
-          task_result_result = env[:xc].call("task.get_result",env[:session],task)
-          if task_result_result["Status"] != "Success"
-            raise Errors::APIError
-          end
-
-          task_result = task_result_result["Value"]
+          task_result = env[:xc].task.get_result(task)
 
           doc = REXML::Document.new(task_result)
 

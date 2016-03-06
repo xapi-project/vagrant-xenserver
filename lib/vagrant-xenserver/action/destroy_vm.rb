@@ -11,18 +11,18 @@ module VagrantPlugins
         end
         
         def call(env)
-          env[:xc].call("VM.hard_shutdown",env[:session],env[:machine].id)
+          env[:xc].VM.hard_shutdown(env[:machine].id)
           
-          vbds = env[:xc].call("VM.get_VBDs",env[:session],env[:machine].id)['Value']
+          vbds = env[:xc].VM.get_VBDs(env[:machine].id)
           
           vbds.each { |vbd| 
-            vbd_rec = env[:xc].call("VBD.get_record",env[:session],vbd)['Value']
+            vbd_rec = env[:xc].VBD.get_record(vbd)
             if vbd_rec['type'] == "Disk"
-              env[:xc].call("VDI.destroy",env[:session],vbd_rec['VDI'])
+              env[:xc].VDI.destroy(vbd_rec['VDI'])
             end
           }
 
-          env[:xc].call("VM.destroy",env[:session],env[:machine].id)
+          env[:xc].VM.destroy(env[:machine].id)
 
           env[:machine].id = nil
 

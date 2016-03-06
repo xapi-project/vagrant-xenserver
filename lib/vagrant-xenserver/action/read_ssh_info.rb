@@ -22,20 +22,19 @@ module VagrantPlugins
           return nil if machine.id.nil?
 
           # Find the machine
-          networks = env[:xc].call("network.get_all_records",env[:session])['Value']
-          vif_result = env[:xc].call("VM.get_VIFs",env[:session],machine.id)
+          networks = env[:xc].network.get_all_records
 
-          himn = networks.find { |ref,net| net['other_config']['is_host_internal_management_network'] }
-          (himn_ref,himn_rec) = himn
-          
-          if vif_result['Status']=='Failure'
-            # The machine can't be found
+          begin
+            vifs = env[:xc].VM.get_VIFs(machine.id)
+          rescue
             @logger.info("Machine couldn't be found, assuming it got destroyed.")
             machine.id = nil
             return nil
           end
-
-          vifs = vif_result['Value']
+            
+          himn = networks.find { |ref,net| net['other_config']['is_host_internal_management_network'] }
+          (himn_ref,himn_rec) = himn
+            
           assigned_ips = himn_rec['assigned_ips']
           (vif,ip) = assigned_ips.find { |vif,ip| vifs.include? vif }
 

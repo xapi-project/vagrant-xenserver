@@ -13,12 +13,8 @@ module VagrantPlugins
         def call(env)
           myvm = env[:machine].id
           
-          shutdown_result = env[:xc].call("VM.clean_shutdown",env[:session],myvm)
+          shutdown_result = env[:xc].VM.clean_shutdown(myvm)
 
-          if shutdown_result["Status"] != "Success"
-            raise Errors::APIError
-          end
-          
           @app.call env
         end
       end

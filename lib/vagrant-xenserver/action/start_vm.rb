@@ -16,7 +16,7 @@ module VagrantPlugins
         def call(env)
           myvm = env[:machine].id
           
-          env[:xc].call("VM.start",env[:session],myvm,false,false)
+          env[:xc].VM.start(myvm,false,false)
 
           @app.call env
         end

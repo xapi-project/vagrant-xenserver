@@ -19,15 +19,14 @@ module VagrantPlugins
         def read_state(xc, session, machine)
           return :not_created if machine.id.nil?
 
-          result = xc.call("VM.get_record",session,machine.id)
-
-          if result["Status"] != "Success"
+          begin
+            result = xc.VM.get_record(machine.id)
+            return result['power_state']
+          rescue
             @logger.info("Machine not found. Assuming it has been destroyed.")
             machine.id = nil
             return :not_created
           end
-          
-          return result["Value"]['power_state']
         end
       end
     end

@@ -1,5 +1,5 @@
 require "log4r"
-require "xmlrpc/client"
+require "xenapi"
 require "vagrant-xenserver/util/uploader"
 require "rexml/document"
 require "json"
@@ -37,7 +37,7 @@ module VagrantPlugins
           box_vhd_file = env[:machine].box.directory.join('box.vhd').to_s
 
           hostname = env[:machine].provider_config.xs_host
-          session = env[:session]
+          session = env[:xc].xenapi_session
 
           @logger.info("box name=" + env[:machine].box.name.to_s)
           @logger.info("box version=" + env[:machine].box.version.to_s)
@@ -49,7 +49,7 @@ module VagrantPlugins
           # Find out if it has already been uploaded
           @@lock.synchronize do
 
-            vdis = env[:xc].call("VDI.get_all_records", env[:session])['Value']
+            vdis = env[:xc].VDI.get_all_records
 
             vdi_tag = "vagrant:" + env[:machine].box.name.to_s + "/" + md5
 
@@ -61,12 +61,14 @@ module VagrantPlugins
             if not vdi_ref_rec
               virtual_size = get_vhd_size(box_vhd_file)
               @logger.info("virtual_size=#{virtual_size}")
-              pool=env[:xc].call("pool.get_all",env[:session])['Value'][0]
-              default_sr=env[:xc].call("pool.get_default_SR",env[:session],pool)['Value']
+              pool=env[:xc].pool.get_all
+              default_sr=env[:xc].pool.get_default_SR(pool[0])
               @logger.info("default_SR="+default_sr)
 
               # Verify the default SR is valid:
-              if env[:xc].call("SR.get_uuid",env[:session],default_sr)['Status'] != "Success"
+              begin
+                env[:xc].SR.get_uuid(default_sr)
+              rescue
                 raise Errors::NoDefaultSR
               end
 
@@ -83,21 +85,19 @@ module VagrantPlugins
                 'sm_config' => {},
                 'tags' => [] }
 
-              vdi_result=env[:xc].call("VDI.create",env[:session],vdi_record)['Value']
+              begin
+                vdi_result=env[:xc].VDI.create(vdi_record)
+              rescue
+                raise Errors::APIError # SR full?
+              end
 
               @logger.info("created VDI: " + vdi_result.to_s)
-              vdi_uuid = env[:xc].call("VDI.get_uuid",env[:session],vdi_result)['Value']
+              vdi_uuid = env[:xc].VDI.get_uuid(vdi_result)
               @logger.info("uuid: "+vdi_uuid)
 
               # Create a task to so we can get the result of the upload
-              task_result = env[:xc].call("task.create", env[:session], "vagrant-vhd-upload",
+              task = env[:xc].task.create("vagrant-vhd-upload",
                                           "Task to track progress of the XVA upload from vagrant")
-
-              if task_result["Status"] != "Success"
-                raise Errors::APIError
-              end
-
-              task = task_result["Value"]
 
               url = "https://#{hostname}/import_raw_vdi?session_id=#{session}&task_id=#{task}&vdi=#{vdi_result}&format=vhd"
 
@@ -118,25 +118,17 @@ module VagrantPlugins
 
               begin
                 sleep(0.2)
-                task_status_result = env[:xc].call("task.get_status",env[:session],task)
-                if task_status_result["Status"] != "Success"
-                  raise Errors::APIError
-                end
-                task_status = task_status_result["Value"]
+                task_status = env[:xc].task.get_status(task)
               end while task_status == "pending"
 
               @logger.info("task_status="+task_status)
 
               if task_status != "success"
+                @logger.info("Erroring here")
                 raise Errors::APIError
               end
 
-              task_result_result = env[:xc].call("task.get_result",env[:session],task)
-              if task_result_result["Status"] != "Success"
-                raise Errors::APIError
-              end
-
-              task_result = task_result_result["Value"]
+              task_result = env[:xc].task.get_result(task)
 
               doc = REXML::Document.new(task_result)
 
@@ -146,8 +138,9 @@ module VagrantPlugins
 
               @logger.info("task_result=" + task_result)
 
-              tag_result=env[:xc].call("VDI.add_tags",env[:session],vdi_result,vdi_tag)
-              @logger.info("task_result=" + tag_result.to_s)
+              tag_result=env[:xc].VDI.add_tags(vdi_result,vdi_tag)
+
+              @logger.info("Added tags")
 
               env[:box_vdi] = vdi_result
             else

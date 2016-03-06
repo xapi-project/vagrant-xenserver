@@ -21,12 +21,12 @@ module VagrantPlugins
               bridge = options[:bridge]
               mac = options[:mac] || ''
 
-              networks = env[:xc].call("network.get_all_records",env[:session])['Value']
+              networks = env[:xc].network.get_all_records
 
               netrefrec = networks.find { |ref,net| net['bridge']==bridge }
               (net_ref,net_rec) = netrefrec
 
-              vif_devices = env[:xc].call("VM.get_allowed_VIF_devices",env[:session],myvm)['Value']
+              vif_devices = env[:xc].VM.get_allowed_VIF_devices(myvm)
               
               vif_record = {
                 'VM' => myvm,
@@ -42,7 +42,7 @@ module VagrantPlugins
                 'ipv6_allowed' => []
               }
               
-              vif_res = env[:xc].call("VIF.create",env[:session],vif_record)
+              vif_res = env[:xc].VIF.create(vif_record)
           
               @logger.info("vif_res=" + vif_res.to_s)
             end

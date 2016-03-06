@@ -16,7 +16,7 @@ module VagrantPlugins
         def call(env)
           vdi_ref = env[:box_vdi]
 
-          clone = env[:xc].call("VDI.clone", env[:session], vdi_ref, {})['Value']
+          clone = env[:xc].VDI.clone(vdi_ref, {})
 
           env[:my_vdi] = clone
 
