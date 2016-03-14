@@ -28,8 +28,10 @@ module VagrantPlugins
             # Create the VM
             if !env[:result]
               b2.use UploadVHD
-              b2.use CloneDisk
-              b2.use CreateVM
+              b2.use DownloadXVA
+              b2.use CreateTemplate
+              b2.use CloneVM
+              b2.use SetVMParams
               b2.use CreateVIFs
             end
             b2.use action_boot
@@ -216,7 +218,9 @@ module VagrantPlugins
       autoload :UploadXVA, action_root.join('upload_xva')
       autoload :UploadVHD, action_root.join('upload_vhd')
       autoload :CloneDisk, action_root.join('clone_disk')
-      autoload :CreateVM, action_root.join('create_vm')
+      autoload :SetVMParams, action_root.join('set_vm_params')
+      autoload :CloneVM, action_root.join('clone_vm')
+      autoload :CreateTemplate, action_root.join('create_template')
       autoload :DestroyVM, action_root.join('destroy_vm')
       autoload :StartVM, action_root.join('start_vm')
       autoload :HaltVM, action_root.join('halt_vm')
@@ -225,6 +229,7 @@ module VagrantPlugins
       autoload :ReadSSHInfo, action_root.join('read_ssh_info')
       autoload :PrepareNFSSettings, action_root.join('prepare_nfs_settings')
       autoload :PrepareNFSValidIds, action_root.join('prepare_nfs_valid_ids')
+      autoload :DownloadXVA, action_root.join('download_xva')
     end
   end
 end

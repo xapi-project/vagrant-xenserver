@@ -48,6 +48,11 @@ module VagrantPlugins
       # @return [Int]
       attr_accessor :memory
 
+      # XVA URL: If this is set, we'll assume that the XenServer should directly download an XVA from the specified URL
+      #
+      # @return [String]
+      attr_accessor :xva_url
+
       def initialize
         @xs_host = UNSET_VALUE
         @xs_port = UNSET_VALUE
@@ -69,9 +74,9 @@ module VagrantPlugins
         @xs_password = nil if @xs_password == UNSET_VALUE
         @name = nil if @name == UNSET_VALUE
         @pv = nil if @pv == UNSET_VALUE
-        @api_timeout = 60 if @api_timeout = UNSET_VALUE
+        @api_timeout = 60 if @api_timeout == UNSET_VALUE
         @memory = 1024 if @memory == UNSET_VALUE
-        @xva_url = nil if @xva_url = UNSET_VALUE
+        @xva_url = nil if @xva_url == UNSET_VALUE
       end
 
       def validate(machine)

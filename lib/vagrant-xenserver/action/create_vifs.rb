@@ -9,10 +9,49 @@ module VagrantPlugins
           @app = app
           @logger = Log4r::Logger.new("vagrant::xenserver::actions::create_vifs")
         end
+
+        def create_vif(env, vm, network, mac)
+          vif_devices = env[:xc].VM.get_allowed_VIF_devices(vm)
+
+          vif_record = {
+            'VM' => vm,
+            'network' => network,
+            'device' => vif_devices[0],
+            'MAC' => mac,
+            'MTU' => '1500',
+            'other_config' => {},
+            'qos_algorithm_type' => '',
+            'qos_algorithm_params' => {},
+            'locking_mode' => 'network_default',
+            'ipv4_allowed' => [],
+            'ipv6_allowed' => []
+          }
+
+          vif_res = env[:xc].VIF.create(vif_record)
+
+          return vif_res
+        end
         
         def call(env)
-          myvm = env[:machine].id
+          vm_ref = env[:machine].id
 
+          networks = env[:xc].network.get_all_records
+
+          # Remove all current VIFs
+          current_vifs = env[:xc].VM.get_VIFs(vm_ref)
+          current_vifs.each { |vif| env[:xc].VIF.destroy(vif) }
+
+          # If a HIMN VIF has been asked for, create one
+          if true
+            himn = networks.find { |ref,net| net['other_config']['is_host_internal_management_network'] }
+            (himn_ref,himn_rec) = himn
+
+            @logger.info("himn_uuid="+himn_rec['uuid'])
+
+            create_vif(env, vm_ref, himn_ref, '')
+          end
+               
+          
           env[:machine].config.vm.networks.each do |type, options|
             next if type == :forwarded_port
             @logger.info "got an interface: #{type} #{options}"
@@ -21,28 +60,10 @@ module VagrantPlugins
               bridge = options[:bridge]
               mac = options[:mac] || ''
 
-              networks = env[:xc].network.get_all_records
-
               netrefrec = networks.find { |ref,net| net['bridge']==bridge }
               (net_ref,net_rec) = netrefrec
 
-              vif_devices = env[:xc].VM.get_allowed_VIF_devices(myvm)
-              
-              vif_record = {
-                'VM' => myvm,
-                'network' => net_ref,
-                'device' => vif_devices[0],
-                'MAC' => mac,
-                'MTU' => '1500',
-                'other_config' => {},
-                'qos_algorithm_type' => '',
-                'qos_algorithm_params' => {},
-                'locking_mode' => 'network_default',
-                'ipv4_allowed' => [],
-                'ipv6_allowed' => []
-              }
-              
-              vif_res = env[:xc].VIF.create(vif_record)
+              vif_res = create_vif(env, vm_ref, net_ref, mac)
           
               @logger.info("vif_res=" + vif_res.to_s)
             end
