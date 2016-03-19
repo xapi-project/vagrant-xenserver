@@ -7,6 +7,11 @@ en:
         The XenServer username must be defined via "xs_username"
       password_required: |-
         The password for the XenServer username must be defined via "xs_password"
+      himn_required: |-
+        Either a public network must be specified or the Host Internal Management Network
+        parameter must be enabled. Public networks require the XenServer tools to be
+        installed in the guest. If this is not the case, the HIMN must be used by specifying
+        'use_himn=true' in the provider configuration.
     errors:
       login_error: |-
         Failed to login to the XenServer. Check the "xs_username" and "xs_password" parameters

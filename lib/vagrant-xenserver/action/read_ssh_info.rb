@@ -12,12 +12,16 @@ module VagrantPlugins
         end
 
         def call(env)
-          env[:machine_ssh_info] = read_ssh_info(env)
+          if env[:machine].provider_config.use_himn
+            env[:machine_ssh_info] = read_ssh_info_himn(env)
+          else
+            env[:machine_ssh_info] = read_ssh_info(env)
+          end
 
           @app.call(env)
         end
 
-        def read_ssh_info(env)
+        def read_ssh_info_himn(env)
           machine = env[:machine]
           return nil if machine.id.nil?
 
@@ -31,10 +35,10 @@ module VagrantPlugins
             machine.id = nil
             return nil
           end
-            
+
           himn = networks.find { |ref,net| net['other_config']['is_host_internal_management_network'] }
           (himn_ref,himn_rec) = himn
-            
+
           assigned_ips = himn_rec['assigned_ips']
           (vif,ip) = assigned_ips.find { |vif,ip| vifs.include? vif }
 
@@ -45,15 +49,48 @@ module VagrantPlugins
             :forward_agent => machine.config.ssh.forward_agent,
             :forward_x11   => machine.config.ssh.forward_x11,
           }
-          
+
           ssh_info[:proxy_command] = "ssh '#{machine.provider_config.xs_host}' -l '#{machine.provider_config.xs_username}' nc %h %p"
 
           if not ssh_info[:username]
             ssh_info[:username] = machine.config.ssh.default.username
           end
 
-          ssh_info
+          return ssh_info
         end
+
+        def read_ssh_info(env)
+          machine = env[:machine]
+          return nil if machine.id.nil?
+
+          gm = env[:xc].VM.get_guest_metrics(machine.id)
+
+          begin
+            networks = env[:xc].VM_guest_metrics.get_networks(gm)
+          rescue
+            return nil
+          end
+
+          ip = networks["0/ip"]
+          if ip.nil?
+            return nil
+          end
+
+          ssh_info = {
+            :host          => ip,
+            :port          => machine.config.ssh.guest_port,
+            :username      => machine.config.ssh.username,
+            :forward_agent => machine.config.ssh.forward_agent,
+            :forward_x11   => machine.config.ssh.forward_x11,
+          }
+
+          if not ssh_info[:username]
+            ssh_info[:username] = machine.config.ssh.default.username
+          end
+
+          return ssh_info
+        end
+
       end
     end
   end

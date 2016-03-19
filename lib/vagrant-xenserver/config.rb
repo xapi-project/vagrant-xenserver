@@ -53,6 +53,10 @@ module VagrantPlugins
       # @return [String]
       attr_accessor :xva_url
 
+      # Use HIMN: If this is set, we'll use the host-internal-management-network to connect to the VM (proxying via dom0)
+      # Useful if the guest does not have tools installed
+      attr_accessor :use_himn
+
       def initialize
         @xs_host = UNSET_VALUE
         @xs_port = UNSET_VALUE
@@ -64,6 +68,7 @@ module VagrantPlugins
         @api_timeout = UNSET_VALUE
         @memory = UNSET_VALUE
         @xva_url = UNSET_VALUE
+        @use_himn = UNSET_VALUE
       end
 
       def finalize!
@@ -77,6 +82,7 @@ module VagrantPlugins
         @api_timeout = 60 if @api_timeout == UNSET_VALUE
         @memory = 1024 if @memory == UNSET_VALUE
         @xva_url = nil if @xva_url == UNSET_VALUE
+        @use_himn = false if @use_himn == UNSET_VALUE
       end
 
       def validate(machine)
@@ -85,8 +91,12 @@ module VagrantPlugins
         errors << I18n.t("vagrant_xenserver.config.username_required") if @xs_username.nil?
         errors << I18n.t("vagrant_xenserver.config.password_required") if @xs_password.nil?
 
+        if not (machine.config.vm.networks.any? { |type,options| type == :public_network })
+          errors << I18n.t("vagrant_xenserver.config.himn_required") if not @use_himn
+        end
         { "XenServer Provider" => errors }
       end
     end
   end
 end
+

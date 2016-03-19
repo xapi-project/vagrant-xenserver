@@ -31,7 +31,7 @@ module VagrantPlugins
 
           return vif_res
         end
-        
+
         def call(env)
           vm_ref = env[:machine].id
 
@@ -42,18 +42,17 @@ module VagrantPlugins
           current_vifs.each { |vif| env[:xc].VIF.destroy(vif) }
 
           # If a HIMN VIF has been asked for, create one
-          if true
+          if env[:machine].provider_config.use_himn
             himn = networks.find { |ref,net| net['other_config']['is_host_internal_management_network'] }
             (himn_ref,himn_rec) = himn
 
-            @logger.info("himn_uuid="+himn_rec['uuid'])
+            @logger.debug("himn="+himn.to_s)
 
             create_vif(env, vm_ref, himn_ref, '')
           end
-               
-          
+
+
           env[:machine].config.vm.networks.each do |type, options|
-            next if type == :forwarded_port
             @logger.info "got an interface: #{type} #{options}"
 
             if type == :public_network then
@@ -64,7 +63,7 @@ module VagrantPlugins
               (net_ref,net_rec) = netrefrec
 
               vif_res = create_vif(env, vm_ref, net_ref, mac)
-          
+
               @logger.info("vif_res=" + vif_res.to_s)
             end
           end
