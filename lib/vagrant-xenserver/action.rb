@@ -28,6 +28,7 @@ module VagrantPlugins
             # Create the VM
             if !env[:result]
               b2.use UploadVHD
+              b2.use UploadXVA
               b2.use DownloadXVA
               b2.use CreateTemplate
               b2.use CloneVM

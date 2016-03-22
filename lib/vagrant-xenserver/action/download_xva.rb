@@ -72,8 +72,6 @@ module VagrantPlugins
               end
             }
             env[:template] = template_ref
-
-
           else
             (template_ref, template_rec) = template
             env[:template] = template_ref
