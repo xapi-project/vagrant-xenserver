@@ -101,3 +101,26 @@ To bring the VM up, it should then be as simple as
 ```shell
 vagrant up --provider=xenserver
 ```
+
+# NFS Synced Folder
+To use NFS, please specify something like this in your `Vagrantfile`. See the [documentation](https://www.vagrantup.com/docs/synced-folders/nfs.html) for a complete reference
+
+```
+machine.vm.synced_folder ".", "/vagrant",
+  id: "vagrant-root",
+  disabled: false,
+  type: "nfs",
+  :nfs => true,
+  :mount_options => ['nolock,vers=3,udp,noatime']
+```
+
+## Notes for Windows OS
+
+* You must install `vagrant-winnfsd` plugin
+
+```
+vagrant plugin install vagrant-winnfsd
+```
+
+* You need to install the original [`winnfsd`](https://github.com/winnfsd/winnfsd/releases) or a [patched version](https://github.com/Yasushi/winnfsd/releases), and put the binary `winnfsd.exe` in `C:\HashiCorp\Vagrant\bin`
+
