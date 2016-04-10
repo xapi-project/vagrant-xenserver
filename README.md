@@ -29,7 +29,7 @@ Make sure the default_SR is set, and that a VHD-based SR is in use. Currently th
 
 ## Converting a VirtualBox box file
 
-* Download the box file (e.g. https://vagrantcloud.com/ubuntu/trusty64/version/1/provider/virtualbox.box)
+* Download the box file (e.g. https://vagrantcloud.com/ubuntu/trusty64/version/v20160323.1.0/provider/virtualbox.box)
 * Unpack it:
 ```shell
 mkdir tmp
@@ -38,11 +38,11 @@ tar xvf ../virtualbox.box
 ```
 * Convert the disk image using qemu-img
 ```shell
-qemu-img convert *.vmdk -O vpc box.vhd
+qemu-img convert -O vpc *.vmdk box.vhd
 ```
 * Remove the other files
 ```shell
-rm -f Vagrantfile box.ovf metadata.json 
+rm -f Vagrantfile box.ovf metadata.json
 ```
 * Make a new metadata file
 ```shell
@@ -56,6 +56,12 @@ tar cf ../xenserver.box .
 ```shell
 vagrant box add ubuntu xenserver.box
 ```
+
+## Converting a from an .xva file
+
+* Download and compile [`xva-img`](https://github.com/eriklax/xva-img) tools
+* Follow the instruction there on how to extract the `.xva` to get the `raw` image
+* convert the `raw` image to be `vhd` file just like above instructions and follow the rest
 
 ## Create a Vagrantfile
 
@@ -80,7 +86,16 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 end
 
 ```
-Note that by default there will be no connection to the external network, so most configurations will require a 'public_network' defined as in the above Vagrantfile.
+
+Note that by default there will be no connection to the external network, so most configurations will require a `public_network` defined as in the above Vagrantfile
+
+Another consideration is that if there is already DHCP service on `xenbr0` network (outside the XenServer), or you prefer to set static IP there, you should prevent the HIMN (Host Intermal Management Network) to be the default gateway. It can be done by running these commands in the Xenserver Host (as root):
+
+```shell
+himn=`xe network-list other-config:is_host_internal_management_network=true --minimal`
+xe network-param-set uuid=$himn other-config:ip_disable_gw=true
+```
+
 To bring the VM up, it should then be as simple as
 
 ```shell
