@@ -1,8 +1,6 @@
 require 'socket'
 require 'rbconfig'
 
-require "vagrant-xenserver/util/xe"
-
 def os
     @os ||= (
       host_os = RbConfig::CONFIG['host_os']
@@ -44,17 +42,24 @@ module VagrantPlugins
             env[:nfs_host_ip]    = read_host_ip(env[:machine],env)
             env[:nfs_machine_ip] = env[:xs_host_ip]
 
-            # Get VM UUID
-            vm_result = env[:xc].call("VM.get_record",env[:session],env[:machine].id)['Value']
+            # Get VM record
+            vm = env[:xc].call("VM.get_record",env[:session],env[:machine].id)['Value']
 
             # Get all Networks
             networks = env[:xc].call("network.get_all_records",env[:session])
+
+            # Get VM guest metric
+            vgm = env[:xc].call("VM.get_guest_metrics", env[:session], env[:machine].id)['Value']
+
+            # Get network on guest metric
+            network_metrics = env[:xc].call("VM_guest_metrics.get_networks", env[:session], vgm)
+
             public_network_defined = false
             vm_ip = nil
 
             # check if there is public_network defined in Vagrantfile
             # pick the one which is routable, and return
-            if networks["Status"] == "Success"
+            if network_metrics["Status"] == "Success"
               env[:machine].config.vm.networks.each do |type, options|
                 next if type == :forwarded_port
 
@@ -67,19 +72,12 @@ module VagrantPlugins
                   (ref, xenbr_rec) = xenbr_net
 
                   # Find the VIF's "device" number, e.g. device 2 is eth2 in a centos guest
-                  xenbr_vif = xenbr_rec['VIFs'].find { |vif| vm_result['VIFs'].include? vif }
+                  xenbr_vif = xenbr_rec['VIFs'].find { |vif| vm['VIFs'].include? vif }
                   vif = env[:xc].call("VIF.get_record", env[:session], xenbr_vif)['Value']
                   print "Finding guest IP in #{options[:bridge]}... "
-                  @logger.info("VM UUID: #{vm_result['uuid']}, #{options[:bridge]} network name-label \"#{xenbr_rec['name_label']}\"")
+                  vm_ip = network_metrics["Value"][vif["device"] + "/ip"]
 
-                  # I don't know the xmlrpc call to get IP address on a VIF, assume
-                  # XenTools is installed, we can get IP from `xe vm-list` command
-                  re = /#{vif['device']}\/ip:\s+(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3});/
-                  xe = ["vm-list uuid=#{vm_result['uuid']} params=networks --minimal", env]
-                  match = Xe::XEViaSSH.new(*xe).execute.stdout.chomp.match re
-
-                  if not match.nil?
-                    vm_ip = match[1]
+                  if !vm_ip.nil?
                     puts vm_ip
                     @logger.info("VM nic on #{options[:bridge]} is eth#{vif['device']} with IPv4 address: #{vm_ip}")
                     if ping(vm_ip)
@@ -89,7 +87,6 @@ module VagrantPlugins
                       return
                     end
                   else
-                    # just print empty blank line :D
                     puts
                   end
                 end
