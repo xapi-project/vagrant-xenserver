@@ -205,6 +205,21 @@ module VagrantPlugins
         end
       end
 
+      def self.action_reload
+        Vagrant::Action::Builder.new.tap do |b|
+          b.use Call, IsCreated do |env1, b2|
+            if !env1[:result]
+              b2.use MessageNotCreated
+              next
+            end
+
+            b2.use ConfigValidate
+            b2.use action_halt
+            b2.use action_boot
+          end
+        end
+      end
+
       action_root = Pathname.new(File.expand_path('../action', __FILE__))
       autoload :CreateVIFs, action_root.join("create_vifs")
       autoload :ConnectXS, action_root.join("connect_xs")
