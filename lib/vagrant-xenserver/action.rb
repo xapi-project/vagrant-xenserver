@@ -20,23 +20,22 @@ module VagrantPlugins
       end
       
       def self.action_up
-	Vagrant::Action::Builder.new.tap do |b|
+        Vagrant::Action::Builder.new.tap do |b|
           b.use HandleBox
           b.use ConfigValidate
           b.use ConnectXS
           b.use Call, IsCreated do |env,b2|
             # Create the VM
             if !env[:result]
-              b2.use UploadVHD
-              b2.use CloneDisk
+              b2.use ConnectXS
+              b2.use UploadVM
               b2.use CreateVM
-              b2.use CreateVIFs
             end
             b2.use action_boot
           end
         end
       end
-      
+
       def self.action_halt
         Vagrant::Action::Builder.new.tap do |b|
           b.use ConfigValidate
@@ -217,6 +216,8 @@ module VagrantPlugins
       autoload :UploadVHD, action_root.join('upload_vhd')
       autoload :CloneDisk, action_root.join('clone_disk')
       autoload :CreateVM, action_root.join('create_vm')
+      autoload :CreateFromVHD, action_root.join('create_vm_from_vhd')
+      autoload :CreateFromTemplate, action_root.join('create_vm_from_template')
       autoload :DestroyVM, action_root.join('destroy_vm')
       autoload :StartVM, action_root.join('start_vm')
       autoload :HaltVM, action_root.join('halt_vm')
