@@ -8,17 +8,19 @@ module VagrantPlugins
       @logger = Log4r::Logger.new('vagrant::xenserver::action')
 
       def self.action_boot
-	Vagrant::Action::Builder.new.tap do |b| 
+        Vagrant::Action::Builder.new.tap do |b|
           b.use Provision
-          b.use PrepareNFSValidIds
+          b.use PrepareSyncedFolderValidIds
           b.use SyncedFolderCleanup
           b.use SyncedFolders
           b.use StartVM
+          b.use ReadSSHInfo
           b.use WaitForCommunicator, ["Running"]
-          b.use PrepareNFSSettings         
+          b.use PrepareNFSSettings
+          b.use PrepareSMBSettings
         end
       end
-      
+
       def self.action_up
 	Vagrant::Action::Builder.new.tap do |b|
           b.use HandleBox
@@ -108,7 +110,7 @@ module VagrantPlugins
             b2.use ConnectXS
             b2.use DestroyVM
             b2.use ProvisionerCleanup
-            b2.use PrepareNFSValidIds
+            b2.use PrepareSyncedFolderValidIds
             b2.use SyncedFolderCleanup
           end
         end
@@ -224,7 +226,8 @@ module VagrantPlugins
       autoload :ResumeVM, action_root.join('resume_vm')
       autoload :ReadSSHInfo, action_root.join('read_ssh_info')
       autoload :PrepareNFSSettings, action_root.join('prepare_nfs_settings')
-      autoload :PrepareNFSValidIds, action_root.join('prepare_nfs_valid_ids')
+      autoload :PrepareSyncedFolderValidIds, action_root.join('prepare_synced_folder_valid_ids')
+      autoload :PrepareSMBSettings, action_root.join('prepare_smb_settings')
     end
   end
 end
