@@ -19,6 +19,10 @@ module VagrantPlugins
         error_key(:uploader_error)
       end
 
+      class UploadXVAError < VagrantXenServerError
+        error_key(:uploadxva_error)
+      end
+
       class APIError < VagrantXenServerError
         error_key(:api_error)
       end

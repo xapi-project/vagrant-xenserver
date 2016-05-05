@@ -28,12 +28,18 @@ module VagrantPlugins
       # @return [Int]
       attr_accessor :memory
 
+      # Box type; box can be either vhd or xva
+      #
+      # @return [String]
+      attr_accessor :box_type
+
       def initialize
         @xs_host = UNSET_VALUE
         @xs_username = UNSET_VALUE
         @xs_password = UNSET_VALUE
         @pv = UNSET_VALUE
         @memory = UNSET_VALUE
+        @box_type = UNSET_VALUE
       end
 
       def finalize!

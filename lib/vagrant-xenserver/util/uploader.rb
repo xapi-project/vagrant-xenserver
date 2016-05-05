@@ -162,12 +162,13 @@ module VagrantPlugins
 
           # If it didn't exit successfully, we need to parse the data and
           # show an error message.
-          if result.exit_code != 0
-            @logger.warn("Uploader exit code: #{result.exit_code}")
-            parts    = result.stderr.split(/\n*curl:\s+\(\d+\)\s*/, 2)
-            parts[1] ||= ""
-            raise Errors::UploaderError, message: parts[1].chomp
-          end
+          # Ignore this for now since the xapi seems to abort connections instead of letting the client close it nicely.
+          #if result.exit_code != 0
+          #  @logger.warn("Uploader exit code: #{result.exit_code}")
+          #  parts    = result.stderr.split(/\n*curl:\s+\(\d+\)\s*/, 2)
+          #  parts[1] ||= ""
+          #  raise Errors::UploaderError, message: parts[1].chomp
+          #end
 
           result
         end

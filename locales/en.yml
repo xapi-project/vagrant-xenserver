@@ -7,4 +7,8 @@ en:
         The XenServer username must be defined via "xs_username"
       password_required: |-
         The password for the XenServer username must be defined via "xs_password"
+    errors:
+      uploadxva_error: |-
+        Error while uploading or finding the uploaded xva:
 
+        %{message}

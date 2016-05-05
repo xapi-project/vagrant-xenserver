@@ -15,61 +15,22 @@ module VagrantPlugins
         end
         
         def call(env)
-          vdi_ref = env[:my_vdi]
-          
-          networks = env[:xc].call("network.get_all_records",env[:session])['Value']
-
-          himn = networks.find { |ref,net| net['other_config']['is_host_internal_management_network'] }
-          (himn_ref,himn_rec) = himn
-
-          @logger.info("himn_uuid="+himn_rec['uuid'])
-          
           username = Etc.getlogin
-          
-          oim = env[:xc].call("VM.get_by_name_label",env[:session],"Other install media")['Value'][0]
-
+          data_dir = env[:machine].data_dir
           box_name = env[:machine].box.name.to_s
           box_version = env[:machine].box.version.to_s
 
-          vm_name = "#{username}/#{box_name}/#{box_version}"
+          vm_name = "#{username}/#{data_dir}/#{box_name}/#{box_version}"
 
-          vm_ref = env[:xc].call("VM.clone",env[:session],oim,vm_name)['Value']
-
-          vbd_record = {
-            'VM' => vm_ref,
-            'VDI' => env[:my_vdi],
-            'userdevice' => '0',
-            'bootable' => true,
-            'mode' => 'RW',
-            'type' => 'Disk',
-            'unpluggable' => false,
-            'empty' => false,
-            'other_config' => {},
-            'qos_algorithm_type' => '',
-            'qos_algorithm_params' => {}
-          }
-
-          vbd_res = env[:xc].call("VBD.create",env[:session],vbd_record)
-          
-          @logger.info("vbd_res=" + vbd_res.to_s)
-
-          vif_record = {
-            'VM' => vm_ref,
-            'network' => himn_ref,
-            'device' => '0',
-            'MAC' => '',
-            'MTU' => '1500',
-            'other_config' => {},
-            'qos_algorithm_type' => '',
-            'qos_algorithm_params' => {},
-            'locking_mode' => 'network_default',
-            'ipv4_allowed' => [],
-            'ipv6_allowed' => []
-          }
-
-          vif_res = env[:xc].call("VIF.create",env[:session],vif_record)
-          
-          @logger.info("vif_res=" + vif_res.to_s)
+          box_type = env[:machine].provider_config.box_type
+          vm_ref = case box_type
+                   when "vhd"
+                     CreateVMFromVHD(env, vm_name)
+                   when "xva"
+                     CreateVMFromTemplate(env, box_name, box_version, vm_name)
+                   else
+                     raise Vagrant::Errors::ConfigInvalid("box_type is invalid or not specified")
+                   end
 
           if env[:machine].provider_config.pv
             env[:xc].call("VM.set_HVM_boot_policy",env[:session],vm_ref,"")
