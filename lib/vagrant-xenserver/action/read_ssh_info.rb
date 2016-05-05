@@ -21,39 +21,32 @@ module VagrantPlugins
           machine = env[:machine]
           return nil if machine.id.nil?
 
-          # Find the machine
-          networks = env[:xc].call("network.get_all_records",env[:session])['Value']
-          vif_result = env[:xc].call("VM.get_VIFs",env[:session],machine.id)
+          # Find the vm guest metrics
+          gm_ref = env[:xc].call("VM.get_guest_metrics",env[:session],machine.id)['Value']
 
-          himn = networks.find { |ref,net| net['other_config']['is_host_internal_management_network'] }
-          (himn_ref,himn_rec) = himn
-          
-          if vif_result['Status']=='Failure'
-            # The machine can't be found
-            @logger.info("Machine couldn't be found, assuming it got destroyed.")
-            machine.id = nil
-            return nil
+          # Get the assigned networks
+          networks = env[:xc].call("VM_guest_metrics.get_networks",env[:session],gm_ref)['Value']
+          if networks && networks.values[0]
+            ip = networks.values[0]
+
+            ssh_info = {
+              :host          => ip,
+              :port          => machine.config.ssh.guest_port,
+              :username      => machine.config.ssh.username,
+              :forward_agent => machine.config.ssh.forward_agent,
+              :forward_x11   => machine.config.ssh.forward_x11,
+            }
+
+            if not ssh_info[:username]
+              ssh_info[:username] = machine.config.ssh.default.username
+            end
+
+            @logger.info("ssh host: " + ssh_info[:host])
+            ssh_info
+          else
+            ssh_info = nil
+            ssh_info
           end
-
-          vifs = vif_result['Value']
-          assigned_ips = himn_rec['assigned_ips']
-          (vif,ip) = assigned_ips.find { |vif,ip| vifs.include? vif }
-
-          ssh_info = {
-            :host          => ip,
-            :port          => machine.config.ssh.guest_port,
-            :username      => machine.config.ssh.username,
-            :forward_agent => machine.config.ssh.forward_agent,
-            :forward_x11   => machine.config.ssh.forward_x11,
-          }
-          
-          ssh_info[:proxy_command] = "ssh '#{machine.provider_config.xs_host}' -l '#{machine.provider_config.xs_username}' nc %h %p"
-
-          if not ssh_info[:username]
-            ssh_info[:username] = machine.config.ssh.default.username
-          end
-
-          ssh_info
         end
       end
     end
