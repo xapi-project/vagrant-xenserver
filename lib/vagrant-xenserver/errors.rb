@@ -34,6 +34,10 @@ module VagrantPlugins
       class NoDefaultSR < VagrantXenServerError
         error_key(:nodefaultsr_error)
       end
+
+      class NoHostsAvailable < VagrantXenServerError
+        error_key(:nohostsavailable_error)
+      end
     end
   end
 end

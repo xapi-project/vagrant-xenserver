@@ -3,6 +3,7 @@ require "xmlrpc/client"
 require "vagrant-xenserver/util/uploader"
 require "rexml/document"
 require "json"
+require "xenapi"
 
 module VagrantPlugins
   module XenServer
@@ -15,8 +16,12 @@ module VagrantPlugins
         
         def call(env)
           myvm = env[:machine].id
-          
-          env[:xc].VM.start(myvm,false,false)
+
+          begin
+            env[:xc].VM.start(myvm,false,false)
+          rescue XenApi::Errors::NoHostsAvailable
+            raise Errors::NoHostsAvailable
+          end
 
           @app.call env
         end
