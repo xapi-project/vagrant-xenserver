@@ -212,6 +212,7 @@ module VagrantPlugins
       autoload :IsCreated, action_root.join('is_created')
       autoload :IsRunning, action_root.join('is_running')
       autoload :IsSuspended, action_root.join('is_suspended')
+      autoload :UploadVM, action_root.join('upload_vm')
       autoload :UploadXVA, action_root.join('upload_xva')
       autoload :UploadVHD, action_root.join('upload_vhd')
       autoload :CloneDisk, action_root.join('clone_disk')

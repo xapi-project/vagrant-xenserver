@@ -74,7 +74,7 @@ module VagrantPlugins
 
             # Create a task to so we can get the result of the upload
             task_result = env[:xc].call("task.create", env[:session], "vagrant-vhd-upload",
-                                        "Task to track progress of the XVA upload from vagrant")
+                                          "Task to track progress of the VHD upload from vagrant")
             
             if task_result["Status"] != "Success"
               raise Errors::APIError
@@ -93,7 +93,7 @@ module VagrantPlugins
             begin
               uploader.upload!
             rescue Errors::UploaderInterrupted
-              env[:ui].info(I18n.t("vagrant.xenserver.action.upload_xva.interrupted"))
+                env[:ui].info(I18n.t("vagrant.xenserver.action.upload_vhd.interrupted"))
               raise
             end
             
