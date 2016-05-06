@@ -13,7 +13,11 @@ module VagrantPlugins
           b.use PrepareNFSValidIds
           b.use SyncedFolderCleanup
           b.use SyncedFolders
-          b.use StartVM
+          b.use Call, IsRunning do |env, b2|
+            if !env[:result]
+              b2.use StartVM
+            end
+          end
           b.use WaitForCommunicator, ["Running"]
           b.use PrepareNFSSettings         
         end
