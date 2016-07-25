@@ -19,3 +19,5 @@ en:
         Failure executing qemu-img. Check that it is installed and working, and that the VHD file referenced is valid.
       nodefaultsr_error: |-
         Failed to find a valid default SR for the pool. Please set one.
+      nohostsavailable_error: |-
+        No hosts were available to start the VM. Check the memory, disks and whether the hosts are enabled
