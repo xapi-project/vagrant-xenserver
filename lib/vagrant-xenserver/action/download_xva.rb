@@ -3,6 +3,9 @@ require "xmlrpc/client"
 require "vagrant-xenserver/util/uploader"
 require "vagrant-xenserver/util/exnhandler"
 require "rexml/document"
+require "vagrant/util/busy"
+require "vagrant/util/platform"
+require "vagrant/util/subprocess"
 
 module VagrantPlugins
   module XenServer
@@ -36,14 +39,20 @@ module VagrantPlugins
             pool=env[:xc].pool.get_all
             default_sr=env[:xc].pool.get_default_SR(pool[0])
 
-            @logger.info("Downloading XVA from URL: "+xva_url)
+            env[:ui].output("Downloading XVA. This may take some time. Source URL: "+xva_url)
             task = env[:xc].Async.VM.import(xva_url, default_sr, false, false)
 
             begin
               sleep(2.0)
               task_status = env[:xc].task.get_status(task)
+              task_progress = env[:xc].task.get_progress(task) * 100.0
+              output = "Progress: #{task_progress.round(0)}%"
+              env[:ui].clear_line
+              env[:ui].detail(output, new_line: false)
             end while task_status == "pending"
-            
+
+            env[:ui].clear_line
+
             if task_status != "success"
 	    # Task failed - let's find out why:
 	      error_list = env[:xc].task.get_error_info(task)
