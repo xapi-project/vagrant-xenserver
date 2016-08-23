@@ -46,9 +46,8 @@ module VagrantPlugins
 
             begin
               uploader.upload!
-            rescue Errors::UploaderInterrupted
-              env[:ui].info(I18n.t("vagrant.xenserver.action.upload_xva.interrupted"))
-              raise
+            rescue
+              env[:xc].task.cancel(task)
             end
 
             task_status = ""
@@ -59,7 +58,9 @@ module VagrantPlugins
             end while task_status == "pending"
 
             if task_status != "success"
-              raise Errors::APIError
+	      # Task failed - let's find out why:
+	      error_list = env[:xc].task.get_error_info(task)
+              MyUtil::Exnhandler.handle("VM.import", error_list)
             end
 
             task_result = env[:xc].task.get_result(task)

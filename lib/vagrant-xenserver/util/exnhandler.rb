@@ -1,4 +1,5 @@
 # Handle the errors thrown by XenServer
+require "json"
 
 module VagrantPlugins
   module XenServer
@@ -27,6 +28,19 @@ module VagrantPlugins
             raise Errors::APIError,
                   api: api,
                   error: String(error)
+          end
+        end
+
+        def self.handle_xenapiexn(api,e,logger)
+          case e
+          when XenApi::Errors::SRFull
+            raise Errors::InsufficientSpace
+          when XenApi::Errors::GenericError
+            # Grotesque hack - get the error array back by parsing the string
+            # representation as JSON. Bleurgh!
+            self.handle(api,JSON.parse(e.message))
+          else
+            self.handle(api,e)
           end
         end
       end

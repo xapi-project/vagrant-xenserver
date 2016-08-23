@@ -1,6 +1,7 @@
 require "log4r"
 require "xenapi"
 require "vagrant-xenserver/util/uploader"
+require "vagrant-xenserver/util/exnhandler"
 require "rexml/document"
 require "json"
 
@@ -89,8 +90,8 @@ module VagrantPlugins
 
                   begin
                     vdi_result=env[:xc].VDI.create(vdi_record)
-                  rescue
-                    raise Errors::APIError # SR full?
+                  rescue XenApi::Errors::GenericError => e
+                    MyUtil::Exnhandler.handle_xenapiexn("VDI.create",e,@logger)
                   end
 
                   @logger.info("created VDI: " + vdi_result.to_s)
@@ -111,9 +112,8 @@ module VagrantPlugins
 
                   begin
                     uploader.upload!
-                  rescue Errors::UploaderInterrupted
-                    env[:ui].info(I18n.t("vagrant.xenserver.action.upload_xva.interrupted"))
-                    raise
+                  rescue
+                    env[:xc].task.cancel(task)
                   end
 
                   task_status = ""
@@ -126,8 +126,9 @@ module VagrantPlugins
                   @logger.info("task_status="+task_status)
 
                   if task_status != "success"
-                    @logger.info("Erroring here")
-                    raise Errors::APIError
+	            # Task failed - let's find out why:
+	            error_list = env[:xc].task.get_error_info(task)
+                    MyUtil::Exnhandler.handle("import HTTP handler", error_list)
                   end
 
                   task_result = env[:xc].task.get_result(task)
