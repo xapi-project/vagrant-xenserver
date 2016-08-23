@@ -38,6 +38,14 @@ module VagrantPlugins
       class NoHostsAvailable < VagrantXenServerError
         error_key(:nohostsavailable_error)
       end
+
+      class Import404 < VagrantXenServerError
+        error_key(:import404)
+      end
+
+      class InsufficientSpace < VagrantXenServerError
+        error_key(:insufficientspace)
+      end
     end
   end
 end

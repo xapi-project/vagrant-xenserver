@@ -1,6 +1,7 @@
 require "log4r"
 require "xmlrpc/client"
 require "vagrant-xenserver/util/uploader"
+require "vagrant-xenserver/util/exnhandler"
 require "rexml/document"
 
 module VagrantPlugins
@@ -34,7 +35,8 @@ module VagrantPlugins
             # No template, let's download it.
             pool=env[:xc].pool.get_all
             default_sr=env[:xc].pool.get_default_SR(pool[0])
-              
+
+            @logger.info("Downloading XVA from URL: "+xva_url)
             task = env[:xc].Async.VM.import(xva_url, default_sr, false, false)
 
             begin
@@ -42,10 +44,10 @@ module VagrantPlugins
               task_status = env[:xc].task.get_status(task)
             end while task_status == "pending"
             
-            @logger.info("task_status="+task_status)
-
             if task_status != "success"
-              raise Errors::APIError
+	    # Task failed - let's find out why:
+	      error_list = env[:xc].task.get_error_info(task)
+              MyUtil::Exnhandler.handle("Async.VM.import", error_list)
             end
 
             task_result = env[:xc].task.get_result(task)

@@ -21,3 +21,9 @@ en:
         Failed to find a valid default SR for the pool. Please set one.
       nohostsavailable_error: |-
         No hosts were available to start the VM. Check the memory, disks and whether the hosts are enabled
+      import404: |-
+        The XVA import failed with a 404 Not Found error: Check the xva_url parameter of your box.
+      insufficientspace: |-
+        There is insufficient space available on the SR.
+      api_error: |-
+        The API call '%{api}' failed with error '%{error}'.
