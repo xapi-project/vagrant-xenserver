@@ -8,7 +8,7 @@ module VagrantPlugins
       @logger = Log4r::Logger.new('vagrant::xenserver::action')
 
       def self.action_boot
-	Vagrant::Action::Builder.new.tap do |b| 
+	Vagrant::Action::Builder.new.tap do |b|
           b.use Provision
           b.use PrepareNFSValidIds
           b.use SyncedFolderCleanup
@@ -19,10 +19,10 @@ module VagrantPlugins
             end
           end
           b.use WaitForCommunicator, ["Running"]
-          b.use PrepareNFSSettings         
+          b.use PrepareNFSSettings
         end
       end
-      
+
       def self.action_up
 	Vagrant::Action::Builder.new.tap do |b|
           b.use HandleBox
@@ -43,7 +43,7 @@ module VagrantPlugins
           end
         end
       end
-      
+
       def self.action_halt
         Vagrant::Action::Builder.new.tap do |b|
           b.use ConfigValidate
@@ -58,7 +58,7 @@ module VagrantPlugins
                 @logger.info "Not running"
                 next
               end
-              b3.use HaltVM            
+              b3.use HaltVM
             end
           end
         end
@@ -214,15 +214,20 @@ module VagrantPlugins
 
       def self.action_reload
         Vagrant::Action::Builder.new.tap do |b|
-          b.use Call, IsCreated do |env1, b2|
-            if !env1[:result]
-              b2.use MessageNotCreated
+          b.use ConfigValidate
+          b.use Call, IsCreated do |env, b2|
+            if !env[:result]
+              @logger.info "MessageNotCreated"
               next
             end
-
-            b2.use ConfigValidate
-            b2.use action_halt
-            b2.use action_boot
+            b2.use ConnectXS
+            b2.use Call, IsRunning do |env, b3|
+              if !env[:result]
+                @logger.info "Not running"
+                next
+              end
+              b3.use ReloadVM
+            end
           end
         end
       end
@@ -253,4 +258,3 @@ module VagrantPlugins
     end
   end
 end
-
