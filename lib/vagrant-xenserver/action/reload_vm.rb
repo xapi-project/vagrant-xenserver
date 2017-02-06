@@ -13,7 +13,7 @@ module VagrantPlugins
         def call(env)
           myvm = env[:machine].id
 
-          reboot_task = env[:xc].Async.VM.reboot(myvm,false,false)
+          reboot_task = env[:xc].Async.VM.clean_reboot(myvm,false,false)
           while env[:xc].task.get_status(reboot_task) == 'pending' do
               sleep 1
           end
