@@ -12,22 +12,28 @@ module VagrantPlugins
         end
 
         def call(env)
-          if not env[:xc]
-            config = env[:machine].provider_config
+          config = env[:machine].provider_config
+
+          # Only even try to connect if we've got a hostname
+          if (not env[:xc]) && (not config.xs_host.nil?)
             uri = URI::Generic.new(config.xs_use_ssl ? 'https' : 'http',
-                                nil,
-                                config.xs_host,
-                                config.xs_port,
-                                nil,
-                                "/",
-                                nil,
-                                nil, nil)
+                              nil,
+                              config.xs_host,
+                              config.xs_port,
+                              nil,
+                              "/",
+                              nil,
+                              nil, nil)
             env[:xc] = XenApi::Client.new(uri.to_s, timeout = config.api_timeout)
 
             @logger.info("Connecting to XenServer")
 
-            if not env[:xc].login_with_password(config.xs_username, config.xs_password)
+            begin
+              result = env[:xc].login_with_password(config.xs_username, config.xs_password)
+            rescue XenApi::Errors::SessionAuthenticationFailed
               raise Errors::LoginError
+            rescue
+              raise Errors::ConnectionError
             end
 
             @logger.info("Connected to XenServer")
@@ -39,4 +45,3 @@ module VagrantPlugins
     end
   end
 end
-
