@@ -18,7 +18,7 @@ module VagrantPlugins
 
         def read_state(xc, session, machine)
           return :not_created if machine.id.nil?
-          return :not_created if not machine.id.startswith?("OpaqueRef")
+          return :not_created if not machine.id.start_with?("OpaqueRef")
 
           begin
             result = xc.VM.get_record(machine.id)

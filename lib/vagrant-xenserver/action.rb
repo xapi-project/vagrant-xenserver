@@ -6,6 +6,11 @@ module VagrantPlugins
     module Action
       include Vagrant::Action::Builtin
       @logger = Log4r::Logger.new('vagrant::xenserver::action')
+      @xvalock = Mutex.new
+
+      def self.getlock
+        @xvalock
+      end
 
       def self.action_boot
 	Vagrant::Action::Builder.new.tap do |b| 

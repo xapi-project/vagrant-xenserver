@@ -21,9 +21,12 @@ module VagrantPlugins
           else
             vm_name = env[:machine].provider_config.name
           end
-          
-          vm = env[:xc].VM.clone(template_ref, vm_name)
-          env[:xc].VM.provision(vm)
+
+          vm = nil
+          Action.getlock.synchronize do
+            vm = env[:xc].VM.clone(template_ref, vm_name)
+            env[:xc].VM.provision(vm)
+          end
 
           env[:machine].id = vm
 
