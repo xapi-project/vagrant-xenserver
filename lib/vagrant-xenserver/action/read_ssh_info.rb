@@ -50,7 +50,7 @@ module VagrantPlugins
             :forward_x11   => machine.config.ssh.forward_x11,
           }
 
-          ssh_info[:proxy_command] = "ssh '#{machine.provider_config.xs_host}' -l '#{machine.provider_config.xs_username}' nc %h %p"
+          ssh_info[:proxy_command] = "ssh '#{machine.provider_config.xs_host}' -l '#{machine.provider_config.xs_username}' -W %h:%p"
 
           if not ssh_info[:username]
             ssh_info[:username] = machine.config.ssh.default.username
