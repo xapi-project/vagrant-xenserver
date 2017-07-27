@@ -141,15 +141,8 @@ plugin supports using the 'host internal management network' (HIMN),
 which is an internal-only network on which a DHCP server runs. Use of
 this requires additional setup of dom0:
 
-N.B. Currently this will only work on XenServer 6.5 and later:
-```shell
-# Install netcat (XenServer 7.0 onwards)
-yum install --enablerepo=base,extras -y nc
-# Install netcat (XenServer 6.5)
-yum install --enablerepo=base,extras --disablerepo=citrix -y nc
-```
-
-You will also need to copy your ssh key to the Xenserver host:
+N.B. Currently this will only work on XenServer 6.5 and later.
+You will need to copy your ssh key to the Xenserver host:
 
     ssh-copy-id root@xenserver
 
