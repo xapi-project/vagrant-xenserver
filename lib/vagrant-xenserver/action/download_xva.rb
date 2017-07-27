@@ -30,7 +30,7 @@ module VagrantPlugins
           template = nil
 
           Action.getlock.synchronize do
-            templates = env[:xc].VM.get_all_records_where("field \"is_a_template\"=\"true\"")
+            templates = env[:xc].VM.get_all_records_where("field \"is_a_template\"=\"true\" and field \"is_a_snapshot\"=\"false\"")
             template = templates.detect { |vm,vmr|
               vmr["other_config"]["box_name"] == box_name &&
                 vmr["other_config"]["box_version"] == box_version
