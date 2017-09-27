@@ -48,6 +48,11 @@ module VagrantPlugins
       # @return [Int]
       attr_accessor :memory
 
+      # template: If this is set, we'll use the template with this reference rather than downloading one or making a new one
+      #
+      # @return [String]
+      attr_accessor :template
+
       # XVA URL: If this is set, we'll assume that the XenServer should directly download an XVA from the specified URL
       #
       # @return [String]
@@ -66,6 +71,7 @@ module VagrantPlugins
         @name = UNSET_VALUE
         @pv = UNSET_VALUE
         @api_timeout = UNSET_VALUE
+        @template = UNSET_VALUE
         @memory = UNSET_VALUE
         @xva_url = UNSET_VALUE
         @use_himn = UNSET_VALUE
@@ -81,6 +87,7 @@ module VagrantPlugins
         @pv = nil if @pv == UNSET_VALUE
         @api_timeout = 60 if @api_timeout == UNSET_VALUE
         @memory = 1024 if @memory == UNSET_VALUE
+        @template = nil if @template == UNSET_VALUE
         @xva_url = nil if @xva_url == UNSET_VALUE
         @use_himn = false if @use_himn == UNSET_VALUE
       end
