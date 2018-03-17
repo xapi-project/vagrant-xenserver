@@ -27,3 +27,6 @@ en:
         There is insufficient space available on the SR.
       api_error: |-
         The API call '%{api}' failed with error '%{error}'.
+      connection_error: |-
+        Failed to connect to the XenServer. Please verify "xs_host" setting is correct.
+

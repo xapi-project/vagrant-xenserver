@@ -1,3 +1,8 @@
+# 0.0.14 (27 July 2017)
+* Fix use of snapshots
+* Better error when when the host doesn't have the required PIF
+* No longer require netcat on the target host
+
 # 0.0.8 (8 September 2014)
 
 * Correct typos

@@ -46,7 +46,11 @@ module VagrantPlugins
       class InsufficientSpace < VagrantXenServerError
         error_key(:insufficientspace)
       end
+
+      class ConnectionError < VagrantXenServerError
+        error_key(:connection_error)
+      end
+      
     end
   end
 end
-

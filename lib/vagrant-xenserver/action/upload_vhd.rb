@@ -45,7 +45,11 @@ module VagrantPlugins
               @logger.info("box name=" + env[:machine].box.name.to_s)
               @logger.info("box version=" + env[:machine].box.version.to_s)
 
-              md5=`dd if=#{box_vhd_file} bs=1M count=1 | md5sum | cut '-d ' -f1`.strip
+              md5cmd = 'md5sum'
+              if `uname` =~ /^Darwin/
+                md5cmd = 'md5'
+              end
+              md5=`dd if=#{box_vhd_file} bs=1048576 count=1 | #{md5cmd} | cut '-d ' -f1`.strip
 
               @logger.info("md5=#{md5}")
 
