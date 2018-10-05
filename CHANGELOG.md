@@ -1,3 +1,7 @@
+# 0.0.15 (5 Oct 2018)
+* Add xmlrpc as explicit dependency
+* Fix for md5 on OSX (wojciech@koszek.com)
+
 # 0.0.14 (27 July 2017)
 * Fix use of snapshots
 * Better error when when the host doesn't have the required PIF
