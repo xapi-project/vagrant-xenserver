@@ -56,7 +56,7 @@ Or to create an XVA box:
 ```shell
 echo "{\"provider\": \"xenserver\"}" > metadata.json
 cp /path/to/ubuntu-15.10-amd64.xva box.xva
-tar cf ubuntu.box metadata.json Vagrantfile
+tar cf ubuntu.box metadata.json box.xva
 ```
 
 VHD based boxes are useful if you are converting from a box from
