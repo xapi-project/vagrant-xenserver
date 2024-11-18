@@ -1,3 +1,6 @@
+# 0.0.17 (18 Nov 2024)
+* Remove unused nokogiri dependency
+
 # 0.0.15 (5 Oct 2018)
 * Add xmlrpc as explicit dependency
 * Fix for md5 on OSX (wojciech@koszek.com)

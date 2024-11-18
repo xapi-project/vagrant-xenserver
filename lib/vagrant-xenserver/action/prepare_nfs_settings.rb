@@ -1,4 +1,3 @@
-require 'nokogiri'
 require 'socket'
 require 'rbconfig'
 
