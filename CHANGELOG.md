@@ -1,3 +1,6 @@
+# 0.0.18 (18 Nov 2024)
+* Disable ssh lock
+
 # 0.0.17 (18 Nov 2024)
 * Remove unused nokogiri dependency
 
